@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="hi">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>SBX HRMS Tracker</title>
+      <link rel="stylesheet" href="style.css">
+   </head>
+   <body>
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">
+ ☰
+</button>
+      <aside class="sidebar">
+         <div class="brand">SBX HR</div>
+         <nav><a href="#dashboard" class="active">Dashboard</a><a href="#employees">Employees</a><a href="#attendance">Attendance</a><a href="#calendar">Calendar</a><a href="#tasks">Tasks</a><a href="#leaves">Leaves</a><a href="#payroll">Payroll</a><a href="#charts">Charts</a><a href="#announcements">Announcements</a><a href="#documents">Documents</a><a href="#notes">Admin Notes</a><a href="#settings">Settings</a></nav>
+      </aside>
+      <main class="main">
+         <header class="topbar">
+            <div>
+               <h1>Employee HR Dashboard</h1>
+               <p>Attendance, Breaks, Leaves, Payroll, Tasks & Reports</p>
+            </div>
+            <div class="top-actions"><button onclick="showNotifications()">🔔 <span id="notifyCount">0</span></button><button onclick="logout()">Logout</button></div>
+         </header>
+         <section id="loginBox" class="login-card">
+            <h2>Login</h2>
+            <select id="role">
+               <option value="employee">Employee</option>
+               <option value="admin">Admin</option>
+            </select>
+            <input id="employeeCode" placeholder="Employee Code"><input id="employeePin" type="password" placeholder="Employee PIN"><input id="adminPassword" type="password" placeholder="Admin Password"><button onclick="login()">Login</button>
+            <p class="hint">Admin Password: <b>admin123</b></p>
+         </section>
+         <section id="employeePanel" class="hidden">
+            <div class="page-title">
+               <h2>Employee Panel</h2>
+               <p id="employeeWelcome"></p>
+               <div id="employeeProfileCard" class="employee-profile-card"></div>
+               <div id="employeeRewardsBox"></div>
+               <div id="achievementBox" class="card"></div>
+               <div id="employeeLeaveAlerts" class="leave-alert-box"></div>
+               <div id="notificationCenter" <div id="employeeMessages"></div> class="notification-box"></div>
+            </div>
+            <div id="employeeAnnouncements" class="announcement-box"></div>
+            <div id="birthdayBox" class="birthday-box"></div>
+            <div class="quick-actions"><button class="green" onclick="markEntry()">Entry</button><button class="yellow" onclick="startBreak()">Break Start</button><button class="orange" onclick="endBreak()">Break End</button><button class="red" onclick="markExit()">Exit</button></div>
+            <div id="todayStatus" class="status-card"></div>
+            <div class="grid-2">
+               <div class="card">
+                  <h3>Today Work Update</h3>
+                  <textarea id="workText" placeholder="Aaj kya kya kaam kiya?"></textarea>
+                  <button onclick="submitWorkUpdate()">Submit Work Update</button>
+               </div>
+               <div class="card">
+                  <h3>Leave Request</h3>
+                  <input type="date" id="leaveDate">
+                  <textarea id="leaveReason" placeholder="Leave reason likho..."></textarea>
+                  <button onclick="submitLeave()">Submit Leave Request</button>
+               </div>
+            </div>
+            <div class="card">
+               <h3>My Assigned Tasks</h3>
+               <div class="grid-4">
+  <input type="date" id="myTaskDate" onchange="renderMyTasks()">
+  <button onclick="showTodayTasks()">Today Tasks</button>
+  <button onclick="showPendingTasks()">Pending Tasks</button>
+<button onclick="showCompletedTasks()">Completed Tasks</button>
+</div>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Task</th>
+                           <th>Status</th>
+                           <th>Action</th>
+                        </tr>
+                     </thead>
+                     <tbody id="myTaskTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card">
+               <h3>My Monthly Summary</h3>
+               <div id="employeeSummary" class="summary-box"></div>
+              <div class="card">
+  <h3>My Performance Graphs</h3>
+  <div id="employeeGraphBox" class="charts-grid"></div>
+</div>
+            </div>
+         </section>
+         <section id="adminPanel" class="hidden">
+            <div class="page-title" id="dashboard">
+               <h2>Admin Dashboard</h2>
+               <p>Team performance overview</p>
+            </div>
+            <div id="adminBirthdayBox" class="birthday-box"></div>
+            <div class="stats-grid">
+               <div class="stat-card"><span>Total Employees</span><strong id="statEmployees">0</strong></div>
+               <div class="stat-card"><span>Today Present</span><strong id="statPresent">0</strong></div>
+               <div class="stat-card"><span>Today Absent</span><strong id="statAbsent">0</strong></div>
+               <div class="stat-card"><span>Late Today</span><strong id="statLate">0</strong></div>
+               <div class="stat-card"><span>Today Breaks</span><strong id="statBreaks">0</strong></div>
+               <div class="stat-card"><span>Pending Leaves</span><strong id="statLeaves">0</strong></div>
+               <div class="stat-card"><span>Over Leave</span><strong id="statOverLeave">0</strong></div>
+               <div class="stat-card"><span>Late Breaks</span><strong id="statLateBreaks">0</strong></div>
+            </div>
+            <div class="card" id="employeeOfMonthBox"></div>
+            <div class="card" id="leaderboardBox"></div>
+            <div class="card" id="settings">
+               <h3>HR Settings</h3>
+               <button class="danger-btn" onclick="resetMonth()">
+🔄 Close Current Month & Start New Month
+</button>
+               <div class="grid-4"><input type="time" id="officeStartTime"><input type="number" id="allowedBreakMinutes" placeholder="Allowed Break Minutes"><input type="number" id="monthlyLeaveLimit" placeholder="Monthly Leave Limit"><button onclick="saveSettings()">Save Settings</button></div>
+            </div>
+            <div class="card">
+               <h3>Filter Report</h3>
+               <div class="grid-4"><input type="date" id="filterDate"><input type="month" id="filterMonth"><button onclick="applyFilters()">Apply Filter</button><button onclick="clearFilters()">Clear Filter</button></div>
+            </div>
+            <div class="grid-2" id="employees">
+               <div class="card">
+                  <h3>Add Employee</h3>
+                  <input id="newEmpName" placeholder="Employee Name"><input id="newEmpCode" placeholder="Employee Code"><input id="newEmpPin" placeholder="Employee PIN"><input id="newEmpDesignation" placeholder="Designation"><input id="newEmpDepartment" placeholder="Department"><input id="newEmpDOB" type="date"><input id="newEmpSalary" type="number" placeholder="Monthly Salary"><input id="newEmpLeaveLimit" type="number" placeholder="Monthly Leave Limit"><input id="newEmpPhoto" placeholder="Photo URL optional"><button onclick="addEmployee()">Add Employee</button>
+               </div>
+               <div class="card">
+                  <h3>Export Report</h3>
+                  <p class="hint">Attendance report CSV me download karo.</p>
+                  <button onclick="exportCSV()">Export CSV</button>
+                  <br><br>
+
+<button onclick="exportBackup()">Export Backup</button>
+
+<br><br>
+
+<input
+  type="file"
+  id="backupFile"
+  accept=".json"
+  onchange="importBackup(event)"
+>
+               </div>
+            </div>
+            <div class="card">
+               <h3>Employees / ID Card Data</h3>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Photo</th>
+                           <th>Name</th>
+                           <th>Code</th>
+                           <th>Designation</th>
+                           <th>Department</th>
+                           <th>DOB</th>
+                           <th>Salary</th>
+                           <th>Leave Limit</th>
+                           <th>Status</th>
+                           <th>Action</th>
+                        </tr>
+                     </thead>
+                     <tbody id="employeeTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="idcards">
+               <h3>Employee ID Cards</h3>
+               <div id="idCardBox" class="id-card-grid"></div>
+            </div>
+            <div class="card" id="attendance">
+               <h3>Attendance Records</h3>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Name</th>
+                           <th>Entry</th>
+                           <th>Late?</th>
+                           <th>Exit</th>
+                           <th>Break Count</th>
+                           <th>Total Break</th>
+                           <th>Late Break?</th>
+                           <th>Working Hours</th>
+                           <th>Break Details</th>
+                        </tr>
+                     </thead>
+                     <tbody id="attendanceTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="calendar">
+               <h3>Monthly Attendance Calendar</h3>
+               <div class="legend"><span class="p">P Present</span><span class="a">A Absent</span><span class="l">L Leave</span></div>
+               <div id="calendarBox" class="calendar-box"></div>
+            </div>
+            <div class="card" id="tasks">
+               <h3>Assign Daily Task</h3>
+               <div class="grid-4"><select id="taskEmployee"></select><input type="date" id="taskDate"><input id="taskText" placeholder="Task likho..."><button onclick="assignTask()">Assign Task</button></div>
+               <h3>Task List</h3>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Employee</th>
+                           <th>Task</th>
+                           <th>Status</th>
+                           <th>Completed</th>
+                           <th>Action</th>
+                        </tr>
+                     </thead>
+                     <tbody id="taskTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="leaves">
+               <h3>Leave Requests</h3>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Employee</th>
+                           <th>Date</th>
+                           <th>Reason</th>
+                           <th>Status</th>
+                           <th>Month Count</th>
+                           <th>Over Leave?</th>
+                           <th>Action</th>
+                        </tr>
+                     </thead>
+                     <tbody id="leaveTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="leaveBalance">
+  <h3>Employee Leave Balance</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Monthly Limit</th>
+          <th>Approved Used</th>
+          <th>Pending</th>
+          <th>Remaining</th>
+          <th>Extra Leave</th>
+        </tr>
+      </thead>
+
+      <tbody id="leaveBalanceTable"></tbody>
+    </table>
+  </div>
+</div>
+            <div class="card" id="payroll">
+               <h3>Payroll Dashboard</h3>
+               <div class="grid-4"><select id="payrollEmployee"></select><input type="number" id="payrollBonus" placeholder="Bonus"><input type="number" id="payrollDeduction" placeholder="Deduction"><button onclick="savePayrollAdjustment()">Save Adjustment</button></div>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Employee</th>
+                           <th>Salary</th>
+                           <th>Present</th>
+                           <th>Leaves</th>
+                           <th>Absent</th>
+                           <th>Bonus</th>
+                           <th>Deduction</th>
+                           <th>Final Salary</th>
+                        </tr>
+                     </thead>
+                     <tbody id="salaryTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="charts">
+               <h3>Dashboard Charts</h3>
+               <div id="chartBox" class="charts-grid"></div>
+            </div>
+            <div class="card" id="announcements">
+               <h3>Announcements</h3>
+               <div class="card">
+<h3>📨 Send Message</h3>
+
+<select id="messageEmp"></select>
+
+<textarea
+id="adminMessage"
+placeholder="Write message..."
+rows="4"></textarea>
+
+<button onclick="sendMessage()">
+Send Message
+</button>
+</div>
+               <div class="grid-4"><input id="announceTitle" placeholder="Announcement Title"><input id="announceText" placeholder="Announcement Message"><input type="date" id="announceExpiry"><button onclick="addAnnouncement()">Publish</button></div>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Title</th>
+                           <th>Message</th>
+                        </tr>
+                     </thead>
+                     <tbody id="announcementTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="documents">
+               <h3>Employee Documents</h3>
+               <div class="grid-4"><select id="docEmployee"></select><input id="docType" placeholder="Doc Type"><input id="docUrl" placeholder="Document URL"><button onclick="addDocument()">Add Document</button></div>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Employee</th>
+                           <th>Type</th>
+                           <th>Link</th>
+                           <th>Date</th>
+                        </tr>
+                     </thead>
+                     <tbody id="documentTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="work">
+               <h3>Daily Work Updates</h3>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Employee</th>
+                           <th>Work Update</th>
+                        </tr>
+                     </thead>
+                     <tbody id="workTable"></tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="card" id="notes">
+               <h3>Admin Notes</h3>
+               <div class="grid-4"><select id="noteEmployee"></select><input type="date" id="noteDate"><input id="noteText" placeholder="Admin note likho..."><button onclick="addAdminNote()">Add Note</button></div>
+               <div class="table-wrap">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Date</th>
+                           <th>Employee</th>
+                           <th>Note</th>
+                        </tr>
+                     </thead>
+                     <tbody id="noteTable"></tbody>
+                  </table>
+               </div>
+            </div>
+         </section>
+      </main>
+      <div id="notificationPanel" class="notification-panel hidden">
+         <h3>Notifications</h3>
+         <div id="notificationList"></div>
+         <button onclick="hideNotifications()">Close</button>
+      </div>
+      <script type="module" src="app.js"></script>
+   </body>
+</html>
