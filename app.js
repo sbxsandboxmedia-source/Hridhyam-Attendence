@@ -266,7 +266,7 @@ window.addEmployee = async function () {
     dob: $("newEmpDOB").value,
     salary: Number($("newEmpSalary").value || 0),
     leaveLimit: Number($("newEmpLeaveLimit").value || settings.monthlyLeaveLimit || 2),
-    photo: "",
+    photo: $("newEmpPhoto").value.trim(),
     active: true,
     createdAt: nowISO()
   });
