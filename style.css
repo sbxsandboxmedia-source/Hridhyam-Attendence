@@ -1694,3 +1694,244 @@ background:#dc2626;
   border:1px dashed #2563eb;
   padding:12px;
 }
+/* ===== HC HR Premium UI Upgrade ===== */
+:root{
+  --hc-bg:#f4f7fb;
+  --hc-card:#ffffff;
+  --hc-dark:#06152e;
+  --hc-blue:#2563eb;
+  --hc-text:#0f172a;
+  --hc-muted:#64748b;
+  --hc-border:#e5edf6;
+}
+
+body{
+  background:var(--hc-bg)!important;
+  color:var(--hc-text)!important;
+}
+
+.sidebar{
+  background:linear-gradient(180deg,#06152e,#082653)!important;
+  box-shadow:18px 0 45px rgba(2,6,23,.16)!important;
+}
+
+.sidebar h1{
+  font-size:26px!important;
+  letter-spacing:.5px!important;
+}
+
+.sidebar a,
+.sidebar button,
+.nav-item{
+  border-radius:14px!important;
+  margin:6px 0!important;
+  transition:.25s!important;
+}
+
+.sidebar a:hover,
+.sidebar button:hover,
+.nav-item:hover,
+.nav-item.active{
+  background:linear-gradient(135deg,#2563eb,#1d4ed8)!important;
+  color:#fff!important;
+  transform:translateX(4px);
+}
+
+.main{
+  background:var(--hc-bg)!important;
+  padding:28px!important;
+}
+
+.card,
+.login-card,
+.page-title{
+  background:rgba(255,255,255,.96)!important;
+  border:1px solid var(--hc-border)!important;
+  border-radius:24px!important;
+  box-shadow:0 14px 40px rgba(15,23,42,.07)!important;
+}
+
+.page-title{
+  padding:26px 30px!important;
+}
+
+.page-title h1,
+.page-title h2{
+  font-size:30px!important;
+  line-height:1.1!important;
+  color:var(--hc-text)!important;
+}
+
+.page-title p{
+  color:var(--hc-muted)!important;
+}
+
+.stats-grid{
+  gap:18px!important;
+}
+
+.stat-card{
+  min-height:130px!important;
+  border-radius:22px!important;
+  background:#fff!important;
+  border:1px solid var(--hc-border)!important;
+  box-shadow:0 12px 30px rgba(15,23,42,.06)!important;
+  position:relative;
+  overflow:hidden;
+}
+
+.stat-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:5px;
+  background:linear-gradient(90deg,#2563eb,#22c55e);
+}
+
+.stat-card span{
+  color:var(--hc-muted)!important;
+  font-size:12px!important;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  font-weight:800!important;
+}
+
+.stat-card strong{
+  font-size:34px!important;
+  color:var(--hc-text)!important;
+}
+
+button{
+  background:linear-gradient(135deg,#2563eb,#1d4ed8)!important;
+  border:none!important;
+  border-radius:14px!important;
+  font-weight:800!important;
+  box-shadow:0 12px 24px rgba(37,99,235,.22)!important;
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+input,
+select,
+textarea{
+  border:1px solid #dbe5f1!important;
+  background:#fff!important;
+  border-radius:16px!important;
+  padding:14px 16px!important;
+  box-shadow:none!important;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  outline:none!important;
+  border-color:#2563eb!important;
+  box-shadow:0 0 0 4px rgba(37,99,235,.12)!important;
+}
+
+.table-wrap{
+  border-radius:18px!important;
+  border:1px solid var(--hc-border)!important;
+  overflow:auto!important;
+}
+
+table{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  background:#fff!important;
+}
+
+th{
+  background:#07152d!important;
+  color:#fff!important;
+  padding:16px!important;
+  font-size:13px!important;
+}
+
+td{
+  padding:14px 16px!important;
+  border-bottom:1px solid #eef2f7!important;
+}
+
+tr:hover td{
+  background:#f8fbff!important;
+}
+
+.employee-profile-card{
+  background:linear-gradient(135deg,#07152d,#1d4ed8)!important;
+  color:#fff!important;
+  border-radius:28px!important;
+  padding:30px!important;
+  box-shadow:0 18px 45px rgba(29,78,216,.25)!important;
+}
+
+.reward-card{
+  border-left:6px solid #f59e0b!important;
+}
+
+.message-item{
+  background:#eff6ff!important;
+  border-left:5px solid #2563eb!important;
+  padding:14px!important;
+  border-radius:14px!important;
+  margin:10px 0!important;
+}
+
+/* Compact dashboard spacing */
+.grid-2,
+.grid-3,
+.grid-4,
+.charts-grid{
+  gap:18px!important;
+}
+
+.card h3{
+  font-size:20px!important;
+  margin-bottom:18px!important;
+}
+
+/* Mobile premium */
+@media(max-width:768px){
+  .main{
+    padding:14px!important;
+  }
+
+  .page-title{
+    margin-top:58px!important;
+    padding:22px!important;
+  }
+
+  .page-title h1,
+  .page-title h2{
+    font-size:25px!important;
+  }
+
+  .stats-grid,
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .charts-grid{
+    grid-template-columns:1fr!important;
+  }
+
+  .stat-card{
+    min-height:105px!important;
+  }
+
+  .card{
+    padding:18px!important;
+    border-radius:22px!important;
+  }
+
+  .sidebar{
+    width:270px!important;
+  }
+
+  table{
+    min-width:760px!important;
+  }
+}
