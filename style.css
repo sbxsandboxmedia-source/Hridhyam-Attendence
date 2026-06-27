@@ -1962,3 +1962,55 @@ tr:hover td{
   border-radius:999px;
   font-weight:800;
 }
+#departmentOverview{
+  margin-top:18px;
+  display:grid;
+  gap:14px;
+}
+
+#departmentOverview .dept-card{
+  background:#ffffff;
+  border:1px solid #e5edf6;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 10px 25px rgba(15,23,42,.06);
+}
+
+#departmentOverview .dept-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom:1px solid #edf1f7;
+}
+
+#departmentOverview .dept-header strong{
+  font-size:17px;
+  color:#0f172a;
+}
+
+#departmentOverview .dept-header span{
+  background:#2563eb;
+  color:#fff;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:800;
+}
+
+#departmentOverview .dept-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px dashed #e5e7eb;
+}
+
+#departmentOverview .dept-row:last-child{
+  border-bottom:none;
+}
+
+#departmentOverview .dept-row small{
+  color:#64748b;
+}
