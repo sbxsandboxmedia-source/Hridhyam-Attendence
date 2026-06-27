@@ -637,6 +637,58 @@ function setOptions() {
   });
 }
 
+function renderDepartmentOverview() {
+
+    const box = $("departmentOverview");
+    const filter = $("departmentFilter");
+
+    if (!box || !filter) return;
+
+    const departments = [...new Set(
+        employees
+            .map(e => (e.department || "").trim())
+            .filter(d => d)
+    )].sort();
+
+    filter.innerHTML =
+        '<option value="">All Departments</option>' +
+        departments.map(d => `<option value="${d}">${d}</option>`).join("");
+
+    const selected = filter.value;
+
+    let list = employees.filter(e => e.active !== false);
+
+    if (selected) {
+        list = list.filter(e => e.department === selected);
+    }
+
+    const grouped = {};
+
+    list.forEach(emp => {
+        const dept = emp.department || "No Department";
+        grouped[dept] = grouped[dept] || [];
+        grouped[dept].push(emp);
+    });
+
+    box.innerHTML = Object.keys(grouped).length
+        ? Object.entries(grouped).map(([dept, arr]) => `
+            <div class="dept-card">
+                <div class="dept-header">
+                    <strong>${dept}</strong>
+                    <span>${arr.length} Employees</span>
+                </div>
+
+                ${arr.map(e => `
+                    <div class="dept-row">
+                        <span>${e.name}</span>
+                        <small>${e.designation || "-"}</small>
+                    </div>
+                `).join("")}
+            </div>
+        `).join("")
+        : "<p>No Department Found</p>";
+}
+
 function renderTodayStatus() {
   if (!currentEmployee || !$("todayStatus")) return;
 
