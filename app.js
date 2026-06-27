@@ -650,11 +650,15 @@ function renderDepartmentOverview() {
             .filter(d => d)
     )].sort();
 
-    filter.innerHTML =
-        '<option value="">All Departments</option>' +
-        departments.map(d => `<option value="${d}">${d}</option>`).join("");
+    const oldSelected = filter.value;
 
-    const selected = filter.value;
+filter.innerHTML =
+  '<option value="">All Departments</option>' +
+  departments.map(d => `<option value="${d}">${d}</option>`).join("");
+
+filter.value = oldSelected;
+
+const selected = filter.value;
 
     let list = employees.filter(e => e.active !== false);
 
