@@ -107,6 +107,15 @@
             </div>
             <div class="card" id="employeeOfMonthBox"></div>
             <div class="card" id="leaderboardBox"></div>
+            <div class="card">
+  <h3>🏢 Department Overview</h3>
+
+  <select id="departmentFilter" onchange="renderDepartmentOverview()">
+    <option value="">All Departments</option>
+  </select>
+
+  <div id="departmentOverview"></div>
+</div>
             <div class="card" id="settings">
                <h3>HR Settings</h3>
                <button class="danger-btn" onclick="resetMonth()">
