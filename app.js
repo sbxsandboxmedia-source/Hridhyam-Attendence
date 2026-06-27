@@ -637,7 +637,7 @@ function setOptions() {
   });
 }
 
-function renderDepartmentOverview() {
+window.renderDepartmentOverview = function () {
 
     const box = $("departmentOverview");
     const filter = $("departmentFilter");
