@@ -1361,8 +1361,9 @@ function renderAdmin() {
   $("monthlyLeaveLimit").value = settings.monthlyLeaveLimit;
 
   setOptions();
+renderDepartmentOverview();
 
-  const today = todayKey();
+const today = todayKey();
   const activeEmployees = employees.filter(e => e.active !== false);
   const todayRecords = records.filter(r => r.date === today);
   const uniquePresent = new Set(todayRecords.map(r => r.empId)).size;
