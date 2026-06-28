@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>HC HRMS Tracker</title>
+      <title>SBX HRMS Tracker</title>
       <link rel="stylesheet" href="style.css">
    </head>
    <body>
@@ -11,13 +11,13 @@
  ☰
 </button>
       <aside class="sidebar">
-         <div class="brand">HC HR</div>
+         <div class="brand">SBX HR</div>
          <nav><a href="#dashboard" class="active">Dashboard</a><a href="#employees">Employees</a><a href="#attendance">Attendance</a><a href="#calendar">Calendar</a><a href="#tasks">Tasks</a><a href="#leaves">Leaves</a><a href="#payroll">Payroll</a><a href="#charts">Charts</a><a href="#announcements">Announcements</a><a href="#documents">Documents</a><a href="#notes">Admin Notes</a><a href="#settings">Settings</a></nav>
       </aside>
       <main class="main">
          <header class="topbar">
             <div>
-               <h1>Hridhyam Creation HR Dashboard</h1>
+               <h1>Employee HR Dashboard</h1>
                <p>Attendance, Breaks, Leaves, Payroll, Tasks & Reports</p>
             </div>
             <div class="top-actions"><button onclick="showNotifications()">🔔 <span id="notifyCount">0</span></button><button onclick="logout()">Logout</button></div>
@@ -108,13 +108,21 @@
             <div class="card" id="employeeOfMonthBox"></div>
             <div class="card" id="leaderboardBox"></div>
             <div class="card">
-  <h3>🏢 Department Overview</h3>
+ <h3>🏢 Department Overview</h3>
 
-  <select id="departmentFilter" onchange="renderDepartmentOverview()">
+<div class="grid-2" style="margin-bottom:15px;">
+    <input id="newDepartmentName" placeholder="Department Name">
+
+    <button onclick="addDepartment()">
+        ➕ Add Department
+    </button>
+</div>
+
+<select id="departmentFilter" onchange="renderDepartmentOverview()">
     <option value="">All Departments</option>
-  </select>
+</select>
 
-  <div id="departmentOverview"></div>
+<div id="departmentOverview"></div>
 </div>
             <div class="card" id="settings">
                <h3>HR Settings</h3>
@@ -130,7 +138,9 @@
             <div class="grid-2" id="employees">
                <div class="card">
                   <h3>Add Employee</h3>
-                  <input id="newEmpName" placeholder="Employee Name"><input id="newEmpCode" placeholder="Employee Code"><input id="newEmpPin" placeholder="Employee PIN"><input id="newEmpDesignation" placeholder="Designation"><input id="newEmpDepartment" placeholder="Department"><input id="newEmpDOB" type="date"><input id="newEmpSalary" type="number" placeholder="Monthly Salary"><input id="newEmpLeaveLimit" type="number" placeholder="Monthly Leave Limit"><input id="newEmpPhoto" placeholder="Photo URL optional"><button onclick="addEmployee()">Add Employee</button>
+                  <input id="newEmpName" placeholder="Employee Name"><input id="newEmpCode" placeholder="Employee Code"><input id="newEmpPin" placeholder="Employee PIN"><input id="newEmpDesignation" placeholder="Designation"><div id="newEmpDepartment" class="dept-checkbox-box"></div>
+    <option value="">Select Department</option>
+</select><input id="newEmpDOB" type="date"><input id="newEmpSalary" type="number" placeholder="Monthly Salary"><input id="newEmpLeaveLimit" type="number" placeholder="Monthly Leave Limit"><input id="newEmpPhoto" placeholder="Photo URL optional"><button onclick="addEmployee()">Add Employee</button>
                </div>
                <div class="card">
                   <h3>Export Report</h3>
