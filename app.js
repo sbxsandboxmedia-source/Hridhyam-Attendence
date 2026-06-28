@@ -731,7 +731,6 @@ window.deleteDepartment = async function(name){
 window.renderDepartmentOverview = function () {
   const box = $("departmentOverview");
   const filter = $("departmentFilter");
-
   if (!box || !filter) return;
 
   const oldSelected = filter.value;
@@ -744,63 +743,49 @@ window.renderDepartmentOverview = function () {
 
   const selected = filter.value;
 
-  let list = employees.filter(e => e.active !== false);
-
-  if (selected) {
-    list = list.filter(e =>
-      (e.departments || [e.department || ""]).includes(selected)
-    );
-  }
-
-  const grouped = {};
-
-  list.forEach(emp => {
-    const empDepartments = emp.departments || [emp.department || "No Department"];
-
-    empDepartments.forEach(dept => {
-      grouped[dept] = grouped[dept] || [];
-      grouped[dept].push(emp);
-    });
-  });
-
-  const totalDepartments = Object.keys(grouped).length;
+  const deptList = selected
+    ? departments.filter(d => d.name === selected)
+    : departments;
 
   box.innerHTML = `
     <div class="dept-summary">
       <div>
         <span>Total Departments</span>
-        <strong>${totalDepartments}</strong>
+        <strong>${departments.length}</strong>
       </div>
     </div>
 
     ${
-      Object.keys(grouped).length
-        ? Object.entries(grouped).map(([dept, arr]) => `
-          <div class="dept-card">
-            <div class="dept-header">
-    <div>
-        <strong>${dept}</strong>
-    </div>
+      deptList.length
+        ? deptList.map(d => {
+            const arr = employees.filter(e =>
+              (e.departments || [e.department || ""]).includes(d.name)
+            );
 
-    <div style="display:flex;gap:10px;align-items:center;">
-        <span class="dept-count">${arr.length} Employees</span>
+            return `
+              <div class="dept-card">
+                <div class="dept-header">
+                  <strong>${d.name}</strong>
 
-        <button
-            class="danger-btn"
-            onclick="deleteDepartment('${dept}')">
-            Delete
-        </button>
-    </div>
-</div>
+                  <div style="display:flex;gap:10px;align-items:center;">
+                    <span>${arr.length} Employees</span>
+                    <button class="danger-btn" onclick="deleteDepartment('${d.name}')">Delete</button>
+                  </div>
+                </div>
 
-            ${arr.map(e => `
-              <div class="dept-row">
-                <span>${e.name}</span>
-                <small>${e.designation || "-"}</small>
+                ${
+                  arr.length
+                    ? arr.map(e => `
+                      <div class="dept-row">
+                        <span>${e.name}</span>
+                        <small>${e.designation || "-"}</small>
+                      </div>
+                    `).join("")
+                    : `<p>No employee in this department</p>`
+                }
               </div>
-            `).join("")}
-          </div>
-        `).join("")
+            `;
+          }).join("")
         : "<p>No Department Found</p>"
     }
   `;
