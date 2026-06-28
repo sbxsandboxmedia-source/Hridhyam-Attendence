@@ -41,6 +41,7 @@ let documentsList = [];
 let payrolls = [];
 
 let currentEmployee = null;
+let editingEmployeeId = null;
 let myTaskMode = "today";
 let messages = [];
 let settings = {
@@ -263,37 +264,59 @@ window.addEmployee = async function () {
     return;
   }
 
-  if (employees.some(e => e.code === code)) {
-    alert("Ye employee code already hai");
-    return;
-  }
+  const selectedDepartments = Array.from(
+    document.querySelectorAll("#newEmpDepartment input:checked")
+  ).map(i => i.value);
 
-  await addDoc(collection(db, "employees"), {
+  const employeeData = {
     name,
     code,
     pin,
     designation: $("newEmpDesignation").value.trim(),
-    department: Array.from(document.querySelectorAll("#newEmpDepartment input:checked")).map(o => o.value).join(", "),
-departments: Array.from(document.querySelectorAll("#newEmpDepartment input:checked")).map(o => o.value),
+    department: selectedDepartments.join(", "),
+    departments: selectedDepartments,
     dob: $("newEmpDOB").value,
     salary: Number($("newEmpSalary").value || 0),
     leaveLimit: Number($("newEmpLeaveLimit").value || settings.monthlyLeaveLimit || 2),
     photo: $("newEmpPhoto").value.trim(),
     active: true,
-    createdAt: nowISO()
-  });
+    updatedAt: nowISO()
+  };
+
+  if (editingEmployeeId) {
+    await updateDoc(doc(db, "employees", editingEmployeeId), employeeData);
+    editingEmployeeId = null;
+    alert("Employee updated");
+  } else {
+    if (employees.some(e => e.code === code)) {
+      alert("Ye employee code already hai");
+      return;
+    }
+
+    employeeData.createdAt = nowISO();
+    await addDoc(collection(db, "employees"), employeeData);
+    alert("Employee added");
+  }
 
   [
     "newEmpName",
     "newEmpCode",
     "newEmpPin",
     "newEmpDesignation",
-    "newEmpDepartment",
     "newEmpDOB",
     "newEmpSalary",
     "newEmpLeaveLimit",
     "newEmpPhoto"
-  ].forEach(id => $(id).value = "");
+  ].forEach(id => {
+    if ($(id)) $(id).value = "";
+  });
+
+  document
+    .querySelectorAll("#newEmpDepartment input:checked")
+    .forEach(i => i.checked = false);
+
+  const btn = document.querySelector('button[onclick="addEmployee()"]');
+  if (btn) btn.innerText = "Add Employee";
 };
 
 window.deleteEmployee = async function (id) {
@@ -674,67 +697,114 @@ window.addDepartment = async function () {
   alert("Department added");
 };
 
+window.deleteDepartment = async function(name){
 
-window.renderDepartmentOverview = function () {
+    if(!confirm(`Delete department "${name}" ?`)) return;
 
-    const box = $("departmentOverview");
-    const filter = $("departmentFilter");
+    const found = departments.find(d => d.name === name);
 
-    if (!box || !filter) return;
-
-    const departments = [...new Set(
-        employees
-            .map(e => (e.department || "").trim())
-            .filter(d => d)
-    )].sort();
-
-    const oldSelected = filter.value;
-
-filter.innerHTML =
-  '<option value="">All Departments</option>' +
-  departments.map(d => `<option value="${d}">${d}</option>`).join("");
-
-filter.value = oldSelected;
-
-const selected = filter.value;
-
-    let list = employees.filter(e => e.active !== false);
-
-    if (selected) {
-        list = list.filter(e =>
-  (e.departments || [e.department || ""]).includes(selected)
-);
+    if(!found){
+        alert("Department not found");
+        return;
     }
 
-    const grouped = {};
+    await deleteDoc(doc(db,"departments",found.id));
 
-    list.forEach(emp => {
-        const empDepartments = emp.departments || [emp.department || "No Department"];
-
-empDepartments.forEach(dept => {
-  grouped[dept] = grouped[dept] || [];
-  grouped[dept].push(emp);
-});
-    });
-
-    box.innerHTML = Object.keys(grouped).length
-        ? Object.entries(grouped).map(([dept, arr]) => `
-            <div class="dept-card">
-                <div class="dept-header">
-                    <strong>${dept}</strong>
-                    <span>${arr.length} Employees</span>
-                </div>
-
-                ${arr.map(e => `
-                    <div class="dept-row">
-                        <span>${e.name}</span>
-                        <small>${e.designation || "-"}</small>
-                    </div>
-                `).join("")}
-            </div>
-        `).join("")
-        : "<p>No Department Found</p>";
+    alert("Department deleted");
 }
+
+window.deleteDepartment = async function(name){
+  if(!confirm("Delete this department?")) return;
+
+  const found = departments.find(d => d.name === name);
+
+  if(!found){
+    alert("Department not found");
+    return;
+  }
+
+  await deleteDoc(doc(db, "departments", found.id));
+
+  alert("Department deleted");
+};
+
+window.renderDepartmentOverview = function () {
+  const box = $("departmentOverview");
+  const filter = $("departmentFilter");
+
+  if (!box || !filter) return;
+
+  const oldSelected = filter.value;
+
+  filter.innerHTML =
+    `<option value="">All Departments</option>` +
+    departments.map(d => `<option value="${d.name}">${d.name}</option>`).join("");
+
+  filter.value = oldSelected;
+
+  const selected = filter.value;
+
+  let list = employees.filter(e => e.active !== false);
+
+  if (selected) {
+    list = list.filter(e =>
+      (e.departments || [e.department || ""]).includes(selected)
+    );
+  }
+
+  const grouped = {};
+
+  list.forEach(emp => {
+    const empDepartments = emp.departments || [emp.department || "No Department"];
+
+    empDepartments.forEach(dept => {
+      grouped[dept] = grouped[dept] || [];
+      grouped[dept].push(emp);
+    });
+  });
+
+  const totalDepartments = Object.keys(grouped).length;
+
+  box.innerHTML = `
+    <div class="dept-summary">
+      <div>
+        <span>Total Departments</span>
+        <strong>${totalDepartments}</strong>
+      </div>
+    </div>
+
+    ${
+      Object.keys(grouped).length
+        ? Object.entries(grouped).map(([dept, arr]) => `
+          <div class="dept-card">
+            <div class="dept-header">
+    <div>
+        <strong>${dept}</strong>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;">
+        <span class="dept-count">${arr.length} Employees</span>
+
+        <button
+            class="danger-btn"
+            onclick="deleteDepartment('${dept}')">
+            Delete
+        </button>
+    </div>
+</div>
+
+            ${arr.map(e => `
+              <div class="dept-row">
+                <span>${e.name}</span>
+                <small>${e.designation || "-"}</small>
+              </div>
+            `).join("")}
+          </div>
+        `).join("")
+        : "<p>No Department Found</p>"
+    }
+  `;
+};
 
 function renderTodayStatus() {
   if (!currentEmployee || !$("todayStatus")) return;
@@ -1490,11 +1560,21 @@ const today = todayKey();
       <td>${e.leaveLimit || settings.monthlyLeaveLimit}</td>
       <td>${e.active !== false ? "Active" : "Inactive"}</td>
       <td>
-        <button onclick="toggleEmployee('${e.id}', ${e.active !== false})">
-          ${e.active !== false ? "Disable" : "Enable"}
-        </button>
-        <button class="red" onclick="deleteEmployee('${e.id}')">Delete</button>
-      </td>
+
+<button onclick="toggleEmployee('${e.id}', ${e.active !== false})">
+    ${e.active !== false ? "Disable" : "Enable"}
+</button>
+
+<button onclick="editEmployee('${e.id}')">
+    Edit
+</button>
+
+<button class="red"
+onclick="deleteEmployee('${e.id}')">
+    Delete
+</button>
+
+</td>
     </tr>
   `).join("");
 
@@ -1914,4 +1994,72 @@ window.importBackup = function(event){
   };
 
   reader.readAsText(file);
+};
+window.editEmployee = async function(id){
+
+  const emp = employees.find(e => e.id === id);
+
+  if(!emp){
+    alert("Employee not found");
+    return;
+  }
+
+  const name = prompt("Employee Name", emp.name || "");
+  if(name === null) return;
+
+  const code = prompt("Employee Code", emp.code || "");
+  if(code === null) return;
+
+  const pin = prompt("Employee PIN", emp.pin || "");
+  if(pin === null) return;
+
+  const designation = prompt("Designation", emp.designation || "");
+  if(designation === null) return;
+
+  const salary = prompt("Monthly Salary", emp.salary || 0);
+  if(salary === null) return;
+
+  const leaveLimit = prompt("Monthly Leave Limit", emp.leaveLimit || settings.monthlyLeaveLimit || 2);
+  if(leaveLimit === null) return;
+
+  await updateDoc(doc(db, "employees", id), {
+    name,
+    code,
+    pin,
+    designation,
+    salary: Number(salary || 0),
+    leaveLimit: Number(leaveLimit || 2)
+  });
+
+  alert("Employee updated");
+};
+window.editEmployee = function(id){
+  const emp = employees.find(e => e.id === id);
+
+  if(!emp){
+    alert("Employee not found");
+    return;
+  }
+
+  editingEmployeeId = id;
+
+  $("newEmpName").value = emp.name || "";
+  $("newEmpCode").value = emp.code || "";
+  $("newEmpPin").value = emp.pin || "";
+  $("newEmpDesignation").value = emp.designation || "";
+  $("newEmpDOB").value = emp.dob || "";
+  $("newEmpSalary").value = emp.salary || "";
+  $("newEmpLeaveLimit").value = emp.leaveLimit || "";
+  $("newEmpPhoto").value = emp.photo || "";
+
+  const empDeps = emp.departments || [];
+
+  document.querySelectorAll("#newEmpDepartment input").forEach(input => {
+    input.checked = empDeps.includes(input.value);
+  });
+
+  const btn = document.querySelector('button[onclick="addEmployee()"]');
+  if(btn) btn.innerText = "Update Employee";
+
+  document.getElementById("employees")?.scrollIntoView({ behavior:"smooth" });
 };
