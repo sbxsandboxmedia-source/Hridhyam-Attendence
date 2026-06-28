@@ -35,6 +35,7 @@ let leaves = [];
 let workUpdates = [];
 let tasks = [];
 let notes = [];
+let departments = [];
 let announcements = [];
 let documentsList = [];
 let payrolls = [];
@@ -151,6 +152,16 @@ onSnapshot(collection(db, "employees"), snap => {
   renderAll();
 });
 
+onSnapshot(query(collection(db, "departments"), orderBy("createdAt")), snap => {
+    departments = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+
+    setOptions();
+    renderDepartmentOverview();
+});
+
 onSnapshot(query(collection(db, "attendance"), orderBy("createdAt", "desc")), snap => {
   records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   renderAll();
@@ -262,7 +273,8 @@ window.addEmployee = async function () {
     code,
     pin,
     designation: $("newEmpDesignation").value.trim(),
-    department: $("newEmpDepartment").value.trim(),
+    department: Array.from(document.querySelectorAll("#newEmpDepartment input:checked")).map(o => o.value).join(", "),
+departments: Array.from(document.querySelectorAll("#newEmpDepartment input:checked")).map(o => o.value),
     dob: $("newEmpDOB").value,
     salary: Number($("newEmpSalary").value || 0),
     leaveLimit: Number($("newEmpLeaveLimit").value || settings.monthlyLeaveLimit || 2),
@@ -635,7 +647,33 @@ function setOptions() {
   ["taskEmployee", "messageEmp", "noteEmployee", "payrollEmployee", "docEmployee"].forEach(id => {
     if ($(id)) $(id).innerHTML = options;
   });
+ if ($("newEmpDepartment")) {
+  $("newEmpDepartment").innerHTML = departments.map(d => `
+    <label class="dept-check">
+      <input type="checkbox" value="${d.name}">
+      <span>${d.name}</span>
+    </label>
+  `).join("");
 }
+}
+
+window.addDepartment = async function () {
+  const name = $("newDepartmentName").value.trim();
+
+  if (!name) {
+    alert("Department name likho");
+    return;
+  }
+
+  await addDoc(collection(db, "departments"), {
+    name,
+    createdAt: nowISO()
+  });
+
+  $("newDepartmentName").value = "";
+  alert("Department added");
+};
+
 
 window.renderDepartmentOverview = function () {
 
@@ -663,15 +701,20 @@ const selected = filter.value;
     let list = employees.filter(e => e.active !== false);
 
     if (selected) {
-        list = list.filter(e => e.department === selected);
+        list = list.filter(e =>
+  (e.departments || [e.department || ""]).includes(selected)
+);
     }
 
     const grouped = {};
 
     list.forEach(emp => {
-        const dept = emp.department || "No Department";
-        grouped[dept] = grouped[dept] || [];
-        grouped[dept].push(emp);
+        const empDepartments = emp.departments || [emp.department || "No Department"];
+
+empDepartments.forEach(dept => {
+  grouped[dept] = grouped[dept] || [];
+  grouped[dept].push(emp);
+});
     });
 
     box.innerHTML = Object.keys(grouped).length
@@ -1061,7 +1104,7 @@ function renderEmployeeOfMonth() {
       </div>
       <div>
         <h2>${top.emp.name}</h2>
-        <p>${top.emp.designation || "Employee"} • ${top.emp.department || "General"}</p>
+        <p>${top.emp.designation || "Employee"} • ${(top.emp.departments || [top.emp.department || "General"]).join(", ")}</p>
         <div class="eom-stats">
           <span>✅ Tasks: ${top.done}</span>
           <span>⏰ Late: ${top.late}</span>
@@ -1416,7 +1459,7 @@ function renderAdmin() {
   $("allowedBreakMinutes").value = settings.allowedBreakMinutes;
   $("monthlyLeaveLimit").value = settings.monthlyLeaveLimit;
 
-  setOptions();
+ setOptions();
 renderDepartmentOverview();
 
 const today = todayKey();
