@@ -2594,14 +2594,18 @@ td:last-child button{
 .id-card button{
   margin:12px 18px 18px!important;
 }
-/* Employee Welcome & Profile Card Gap Fix */
+
+
+/* Employee Panel Layout & Spacing Tight Fix */
 #employeePanel {
-  padding-top: 5px !important;
+  padding-top: 0 !important;
+  margin-top: -10px !important;
 }
 
 #employeeWelcome {
-  margin-bottom: 12px !important;
-  font-size: 16px !important;
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
   color: #1e293b !important;
   display: block !important;
@@ -2610,5 +2614,12 @@ td:last-child button{
 .employee-profile-card {
   margin-top: 0 !important;
   margin-bottom: 20px !important;
-  padding: 20px !important; /* Spacing balanced */
+  padding: 18px 20px !important;
+}
+
+/* Agar Welcome text h3 ya kisi aur tag me ho toh uska default gap hatane ke liye */
+#employeePanel > h3, 
+#employeePanel > div:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
