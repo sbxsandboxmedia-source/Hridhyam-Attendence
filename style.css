@@ -392,14 +392,14 @@ tbody td:last-child{
 }
 
 .id-card::before{
-  content:"";
-  position:absolute;
-  width:170px;
-  height:170px;
-  border-radius:50%;
-  background:rgba(255,255,255,.13);
-  top:-65px;
-  right:-65px;
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:110px;
+    background:linear-gradient(135deg,#0f3fbf,#2563eb);
+    border-radius:0 0 38px 38px;
 }
 
 .id-card-header{
@@ -451,9 +451,12 @@ tbody td:last-child{
   margin-bottom:18px;
 }
 
-.id-card-info p{
-  margin:9px 0;
-  font-size:14px;
+.id-card-info{
+    margin:16px 22px;
+    padding:18px;
+    border-radius:18px;
+    background:#f8fbff;
+    border:1px solid #dbeafe;
 }
 
 .id-card button{
@@ -1852,4 +1855,742 @@ background:#dc2626;
 
 .danger-btn:hover{
     background:#dc2626;
+}
+/* Employee table action button fix */
+td button{
+  padding:8px 12px!important;
+  font-size:13px!important;
+  margin:3px!important;
+  border-radius:10px!important;
+}
+
+td .red,
+button.red{
+  background:#ef4444!important;
+}
+
+/* Action column compact */
+td:last-child{
+  min-width:220px!important;
+  white-space:nowrap!important;
+}
+
+/* ID Card premium upgrade */
+.id-card{
+  background:linear-gradient(160deg,#07152d,#1d4ed8)!important;
+  border-radius:28px!important;
+  box-shadow:0 20px 45px rgba(15,23,42,.22)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+
+.id-card::before{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:180px;
+  right:-45px;
+  top:-45px;
+  background:rgba(255,255,255,.12);
+  border-radius:50%;
+}
+
+.id-card img{
+  width:118px!important;
+  height:118px!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+  border:5px solid #fff!important;
+  box-shadow:0 12px 25px rgba(0,0,0,.25)!important;
+}
+
+.id-card h2,
+.id-card h3{
+  color:#fff!important;
+  letter-spacing:.3px!important;
+}
+
+.id-card p{
+  color:#eaf2ff!important;
+}
+
+.id-card-info,
+.id-card-details{
+  background:rgba(255,255,255,.13)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  border-radius:22px!important;
+  padding:20px!important;
+  color:#fff!important;
+  backdrop-filter:blur(8px);
+}
+
+.id-card button{
+  background:#fff!important;
+  color:#1d4ed8!important;
+  box-shadow:none!important;
+}
+/* ===== FULL HRMS PREMIUM POLISH V2 ===== */
+body{
+  background:linear-gradient(135deg,#eef4fb,#f8fbff)!important;
+}
+
+.card{
+  border-radius:28px!important;
+  border:1px solid rgba(226,232,240,.9)!important;
+  box-shadow:0 18px 45px rgba(15,23,42,.08)!important;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+  transition:.25s ease;
+}
+
+.page-title{
+  background:linear-gradient(135deg,#ffffff,#f8fbff)!important;
+  border-radius:30px!important;
+}
+
+.stats-grid .stat-card{
+  border-radius:26px!important;
+  background:linear-gradient(145deg,#ffffff,#f8fbff)!important;
+}
+
+.stat-card:nth-child(1){background:linear-gradient(145deg,#eff6ff,#ffffff)!important;}
+.stat-card:nth-child(2){background:linear-gradient(145deg,#ecfdf5,#ffffff)!important;}
+.stat-card:nth-child(3){background:linear-gradient(145deg,#fff1f2,#ffffff)!important;}
+.stat-card:nth-child(4){background:linear-gradient(145deg,#fffbeb,#ffffff)!important;}
+
+button{
+  border-radius:16px!important;
+  letter-spacing:.2px;
+}
+
+button.red,
+.red,
+.danger-btn{
+  background:linear-gradient(135deg,#ef4444,#dc2626)!important;
+  color:#fff!important;
+}
+
+input,select,textarea{
+  min-height:52px!important;
+  font-size:15px!important;
+}
+
+.dept-checkbox-box{
+  background:#f8fbff!important;
+  border-radius:22px!important;
+}
+
+.dept-check{
+  border-radius:16px!important;
+  background:#ffffff!important;
+}
+
+.dept-check:hover{
+  border-color:#2563eb!important;
+  box-shadow:0 8px 20px rgba(37,99,235,.12)!important;
+}
+
+.table-wrap{
+  background:#fff!important;
+  border-radius:24px!important;
+  padding:8px!important;
+}
+
+table th{
+  background:#07152d!important;
+}
+
+table td{
+  vertical-align:middle!important;
+}
+
+/* Better action buttons */
+td:last-child button{
+  display:inline-block!important;
+  min-width:76px!important;
+}
+
+/* Section headings */
+.card h3{
+  position:relative;
+  padding-left:4px;
+}
+
+.card h3::after{
+  content:"";
+  display:block;
+  width:46px;
+  height:4px;
+  border-radius:20px;
+  background:#2563eb;
+  margin-top:8px;
+}
+
+/* ID card cleaner */
+.id-card{
+  min-height:520px!important;
+}
+
+.id-card-header{
+  position:relative!important;
+  z-index:2!important;
+}
+
+.id-card-photo{
+  position:relative!important;
+  z-index:2!important;
+}
+
+.id-card-info,
+.id-card-details{
+  position:relative!important;
+  z-index:2!important;
+}
+
+/* Mobile polish */
+@media(max-width:768px){
+  .card{
+    border-radius:24px!important;
+    padding:18px!important;
+  }
+
+  .page-title{
+    border-radius:24px!important;
+  }
+
+  .dept-checkbox-box{
+    grid-template-columns:1fr!important;
+  }
+
+  td:last-child{
+    min-width:250px!important;
+  }
+}
+/* ===== HRMS PREMIUM UI V3 ===== */
+.main{
+  background:
+    radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 35%),
+    linear-gradient(135deg,#f3f7fb,#eef4ff)!important;
+}
+
+.page-title{
+  background:linear-gradient(135deg,#07152d,#1d4ed8)!important;
+  color:#fff!important;
+  box-shadow:0 24px 55px rgba(29,78,216,.25)!important;
+}
+
+.page-title h1,
+.page-title h2,
+.page-title p{
+  color:#fff!important;
+}
+
+.card{
+  background:rgba(255,255,255,.9)!important;
+  backdrop-filter:blur(14px)!important;
+}
+
+.stat-card{
+  border:1px solid rgba(255,255,255,.9)!important;
+}
+
+.stat-card strong{
+  font-size:42px!important;
+}
+
+input,select,textarea{
+  background:#f8fbff!important;
+}
+
+button{
+  background:linear-gradient(135deg,#2563eb,#0047ff)!important;
+}
+
+.sidebar{
+  background:linear-gradient(180deg,#050b1f,#0b2a55)!important;
+}
+
+.sidebar h1{
+  font-size:32px!important;
+}
+
+.sidebar a,
+.nav-item{
+  font-size:16px!important;
+}
+
+.dept-card{
+  border-radius:24px!important;
+  background:linear-gradient(135deg,#ffffff,#f8fbff)!important;
+}
+
+.id-card{
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 30%),
+    linear-gradient(160deg,#06152e,#1e40af,#2563eb)!important;
+}
+/* ===== HRMS V2 CLEAN PROFESSIONAL UI ===== */
+
+/* Fix previous bad blue heading issue */
+.page-title,
+#adminPanel > h2,
+#adminPanel h2{
+  background:#fff!important;
+  color:#0f172a!important;
+  border-radius:28px!important;
+  padding:26px 30px!important;
+  box-shadow:0 14px 35px rgba(15,23,42,.08)!important;
+}
+
+#adminPanel > h2,
+#adminPanel h2{
+  background:transparent!important;
+  box-shadow:none!important;
+  padding:0!important;
+  margin:30px 0 8px!important;
+  font-size:34px!important;
+}
+
+#adminPanel > p{
+  color:#64748b!important;
+  font-size:17px!important;
+  margin-bottom:22px!important;
+}
+
+/* Main layout */
+body{
+  background:#eef3f8!important;
+  color:#0f172a!important;
+}
+
+.main{
+  background:#eef3f8!important;
+  padding:32px!important;
+}
+
+/* Sidebar */
+.sidebar{
+  background:#06152e!important;
+  border-right:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:12px 0 35px rgba(15,23,42,.18)!important;
+}
+
+.sidebar h1{
+  font-size:30px!important;
+  letter-spacing:.5px!important;
+}
+
+.sidebar a,
+.nav-item{
+  border-radius:16px!important;
+  padding:15px 18px!important;
+  margin:8px 0!important;
+  font-size:15px!important;
+}
+
+.sidebar a:hover,
+.nav-item:hover,
+.nav-item.active{
+  background:#22344f!important;
+  transform:none!important;
+}
+
+/* Cards */
+.card{
+  background:#fff!important;
+  border:1px solid #e2e8f0!important;
+  border-radius:26px!important;
+  padding:28px!important;
+  box-shadow:0 12px 32px rgba(15,23,42,.07)!important;
+  transform:none!important;
+}
+
+.card:hover{
+  transform:none!important;
+}
+
+/* Dashboard stat cards */
+.stats-grid{
+  gap:22px!important;
+}
+
+.stat-card{
+  background:#fff!important;
+  border:1px solid #e2e8f0!important;
+  border-radius:24px!important;
+  min-height:150px!important;
+  padding:28px!important;
+  box-shadow:0 10px 25px rgba(15,23,42,.06)!important;
+}
+
+.stat-card span{
+  color:#64748b!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  letter-spacing:.5px!important;
+}
+
+.stat-card strong{
+  color:#0f172a!important;
+  font-size:42px!important;
+  font-weight:900!important;
+}
+
+/* Inputs */
+input,
+select,
+textarea{
+  background:#fff!important;
+  border:1px solid #dbe5f1!important;
+  border-radius:16px!important;
+  min-height:54px!important;
+  padding:14px 16px!important;
+  font-size:15px!important;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#2563eb!important;
+  box-shadow:0 0 0 4px rgba(37,99,235,.12)!important;
+}
+
+/* Buttons */
+button{
+  background:#2563eb!important;
+  color:#fff!important;
+  border:none!important;
+  border-radius:14px!important;
+  padding:13px 20px!important;
+  font-weight:800!important;
+  box-shadow:0 10px 22px rgba(37,99,235,.22)!important;
+}
+
+button:hover{
+  opacity:.92;
+}
+
+button.red,
+.red,
+.danger-btn{
+  background:#ef4444!important;
+  box-shadow:0 10px 22px rgba(239,68,68,.20)!important;
+}
+
+/* Tables */
+.table-wrap{
+  background:#fff!important;
+  border-radius:22px!important;
+  border:1px solid #e2e8f0!important;
+  overflow:auto!important;
+}
+
+table{
+  background:#fff!important;
+}
+
+th{
+  background:#0f172a!important;
+  color:#fff!important;
+  padding:16px!important;
+}
+
+td{
+  padding:16px!important;
+  border-bottom:1px solid #eef2f7!important;
+}
+
+td:last-child{
+  min-width:230px!important;
+  white-space:nowrap!important;
+}
+
+td:last-child button{
+  display:block!important;
+  width:100%!important;
+  margin:6px 0!important;
+}
+
+/* Department section */
+.dept-summary div{
+  background:#eff6ff!important;
+  border:1px solid #bfdbfe!important;
+  border-radius:20px!important;
+}
+
+.dept-card{
+  background:#fff!important;
+  border:1px solid #e2e8f0!important;
+  border-radius:22px!important;
+  box-shadow:0 10px 24px rgba(15,23,42,.06)!important;
+}
+
+.dept-checkbox-box{
+  background:#f8fafc!important;
+  border-radius:20px!important;
+  border:1px solid #dbe5f1!important;
+}
+
+.dept-check{
+  background:#fff!important;
+  border:1px solid #e2e8f0!important;
+  border-radius:16px!important;
+}
+
+/* ID card */
+.id-card{
+  background:linear-gradient(160deg,#07152d,#173b91,#2563eb)!important;
+  border-radius:30px!important;
+  box-shadow:0 22px 45px rgba(15,23,42,.25)!important;
+}
+
+/* Mobile */
+@media(max-width:768px){
+  .main{
+    padding:16px!important;
+  }
+
+  .card{
+    padding:20px!important;
+    border-radius:22px!important;
+  }
+
+  .stats-grid,
+  .grid-2,
+  .grid-3,
+  .grid-4{
+    grid-template-columns:1fr!important;
+  }
+
+  td:last-child{
+    min-width:180px!important;
+  }
+}
+/* ===== PREMIUM ID CARD V3 ===== */
+.id-card-grid{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr))!important;
+  gap:28px!important;
+}
+
+.id-card{
+  background:#fff!important;
+  color:#0f172a!important;
+  border-radius:28px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  min-height:560px!important;
+  box-shadow:0 20px 45px rgba(15,23,42,.12)!important;
+  border:1px solid #e2e8f0!important;
+}
+
+.id-card::before{
+  content:""!important;
+  position:absolute!important;
+  top:0!important;
+  left:0!important;
+  width:100%!important;
+  height:155px!important;
+  background:linear-gradient(135deg,#0f3fbf,#2563eb)!important;
+  border-radius:0 0 45% 45%!important;
+  z-index:0!important;
+}
+
+.id-card-header{
+  padding:24px 26px 0!important;
+  position:relative!important;
+  z-index:2!important;
+  color:#fff!important;
+}
+
+.id-card-header h2{
+  color:#fff!important;
+  font-size:22px!important;
+}
+
+.id-card-header span{
+  color:#eaf2ff!important;
+  font-weight:800!important;
+}
+
+.id-card-photo{
+    margin-top:18px!important;
+    position:relative;
+    z-index:3;
+}
+
+.id-card-photo img{
+  width:122px!important;
+  height:122px!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+  border:6px solid #fff!important;
+  box-shadow:0 14px 30px rgba(15,23,42,.25)!important;
+  background:#fff!important;
+}
+
+.id-card h3{
+  color:#0f172a!important;
+  font-size:26px!important;
+  margin:18px 0 4px!important;
+}
+
+.id-card h3::after{
+  display:none!important;
+}
+
+.id-designation{
+    color:#2563eb!important;
+    font-size:17px;
+    font-weight:700;
+    margin-top:4px;
+    margin-bottom:14px;
+}
+
+
+.id-card-info{
+  background:#f8fbff!important;
+  border:1px solid #e2e8f0!important;
+  color:#0f172a!important;
+  margin:18px 26px!important;
+  padding:20px!important;
+  border-radius:22px!important;
+}
+
+.id-card-info p{
+  color:#0f172a!important;
+  display:grid!important;
+  grid-template-columns:105px 1fr!important;
+  gap:10px!important;
+  margin:10px 0!important;
+  font-size:15px!important;
+}
+
+.id-card-info b{
+  color:#334155!important;
+}
+
+.id-card button{
+  background:#fff!important;
+  color:#2563eb!important;
+  border:1px solid #bfdbfe!important;
+  box-shadow:none!important;
+  width:calc(100% - 52px)!important;
+  margin:8px 26px 26px!important;
+  border-radius:16px!important;
+  font-weight:900!important;
+}
+
+.id-card button:hover{
+  background:#eff6ff!important;
+}
+/* ===== ID CARD FINAL FIX ===== */
+.id-card{
+  min-height:500px!important;
+}
+
+.id-card::before{
+  height:135px!important;
+  border-radius:0 0 42% 42%!important;
+}
+
+.id-card-header h2{
+  color:#ffffff!important;
+  opacity:1!important;
+}
+
+.id-card h3{
+  margin-top:14px!important;
+  color:#0f172a!important;
+}
+
+.id-designation{
+  color:#2563eb!important;
+  opacity:1!important;
+  font-weight:800!important;
+}
+
+.id-card-info{
+  margin-top:14px!important;
+  background:#f8fbff!important;
+}
+
+.id-card-info p,
+.id-card-info b{
+  color:#0f172a!important;
+}
+
+.id-card button{
+  margin-top:10px!important;
+  background:#ffffff!important;
+  color:#2563eb!important;
+}
+/* ===== ID CARD TEXT VISIBILITY FIX ===== */
+.id-card .id-designation,
+.id-card p.id-designation,
+.id-card .id-designation *,
+.id-card > p{
+  color:#2563eb!important;
+  opacity:1!important;
+  font-weight:800!important;
+  text-shadow:none!important;
+}
+
+.id-card h3 + p{
+  color:#2563eb!important;
+  opacity:1!important;
+  font-weight:800!important;
+}
+/* ID CARD SMALL PREMIUM FIX */
+.id-card{
+  width:300px!important;
+  min-height:500px!important;
+  max-width:300px!important;
+  background:#fff!important;
+  color:#111827!important;
+}
+
+.id-card-grid{
+  grid-template-columns:repeat(auto-fit, minmax(300px, 300px))!important;
+  gap:24px!important;
+}
+
+.id-card-info p:nth-child(3){
+  display:none!important;
+}
+
+.id-card::before{
+  height:115px!important;
+}
+
+.id-card-photo{
+  margin-top:20px!important;
+}
+
+.id-card-photo img{
+  width:90px!important;
+  height:90px!important;
+}
+
+.id-card h3{
+  font-size:21px!important;
+}
+
+.id-designation,
+.id-card h3 + p{
+  color:#4f46e5!important;
+  opacity:1!important;
+  font-weight:800!important;
+}
+
+.id-card-info{
+  margin:14px 18px!important;
+  padding:16px!important;
+}
+
+.id-card button{
+  margin:12px 18px 18px!important;
 }
