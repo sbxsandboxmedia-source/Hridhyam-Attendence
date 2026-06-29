@@ -2594,3 +2594,21 @@ td:last-child button{
 .id-card button{
   margin:12px 18px 18px!important;
 }
+/* Employee Welcome & Profile Card Gap Fix */
+#employeePanel {
+  padding-top: 5px !important;
+}
+
+#employeeWelcome {
+  margin-bottom: 12px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  display: block !important;
+}
+
+.employee-profile-card {
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+  padding: 20px !important; /* Spacing balanced */
+}
