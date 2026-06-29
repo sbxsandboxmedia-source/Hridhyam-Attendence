@@ -28,7 +28,6 @@ const ADMIN_PASSWORD = "admin123";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
 let employees = [];
 let records = [];
 let leaves = [];
@@ -93,16 +92,16 @@ function isLate(r) {
   limit.setHours(h, m, 0, 0);
   return new Date(r.entry) > limit;
 }
+
 function lateMinutes(r) {
   if (!r.entry) return 0;
-
   const [h, m] = settings.officeStartTime.split(":").map(Number);
   const limit = new Date(r.entry);
   limit.setHours(h, m, 0, 0);
-
   const diff = Math.floor((new Date(r.entry) - limit) / 60000);
   return Math.max(0, diff);
 }
+
 function isLateBreak(r) {
   return calcBreak(r.breaks || []) > Number(settings.allowedBreakMinutes || 30);
 }
@@ -138,11 +137,9 @@ function filtered(list) {
 async function loadSettings() {
   const ref = doc(db, "settings", "main");
   const snap = await getDoc(ref);
-
   if (snap.exists()) {
     settings = { ...settings, ...snap.data() };
   }
-
   renderAll();
 }
 
@@ -158,7 +155,6 @@ onSnapshot(query(collection(db, "departments"), orderBy("createdAt")), snap => {
         id: doc.id,
         ...doc.data()
     }));
-
     setOptions();
     renderDepartmentOverview();
 });
@@ -205,13 +201,11 @@ onSnapshot(query(collection(db, "payrolls"), orderBy("createdAt", "desc")), snap
 
 window.login = function () {
   const role = $("role").value;
-
   if (role === "admin") {
     if ($("adminPassword").value !== ADMIN_PASSWORD) {
       alert("Wrong admin password");
       return;
     }
-
     $("loginBox").classList.add("hidden");
     $("adminPanel").classList.remove("hidden");
     renderAll();
@@ -220,7 +214,6 @@ window.login = function () {
 
   const code = $("employeeCode").value.trim();
   const pin = $("employeePin").value.trim();
-
   const emp = employees.find(e =>
     e.code === code &&
     String(e.pin || "") === pin &&
@@ -249,7 +242,6 @@ window.saveSettings = async function () {
     allowedBreakMinutes: Number($("allowedBreakMinutes").value || 30),
     monthlyLeaveLimit: Number($("monthlyLeaveLimit").value || 2)
   };
-
   await setDoc(doc(db, "settings", "main"), settings);
   alert("Settings saved");
 };
@@ -292,29 +284,19 @@ window.addEmployee = async function () {
       alert("Ye employee code already hai");
       return;
     }
-
     employeeData.createdAt = nowISO();
     await addDoc(collection(db, "employees"), employeeData);
     alert("Employee added");
   }
 
   [
-    "newEmpName",
-    "newEmpCode",
-    "newEmpPin",
-    "newEmpDesignation",
-    "newEmpDOB",
-    "newEmpSalary",
-    "newEmpLeaveLimit",
-    "newEmpPhoto"
+    "newEmpName", "newEmpCode", "newEmpPin", "newEmpDesignation",
+    "newEmpDOB", "newEmpSalary", "newEmpLeaveLimit", "newEmpPhoto"
   ].forEach(id => {
     if ($(id)) $(id).value = "";
   });
 
-  document
-    .querySelectorAll("#newEmpDepartment input:checked")
-    .forEach(i => i.checked = false);
-
+  document.querySelectorAll("#newEmpDepartment input:checked").forEach(i => i.checked = false);
   const btn = document.querySelector('button[onclick="addEmployee()"]');
   if (btn) btn.innerText = "Add Employee";
 };
@@ -326,19 +308,15 @@ window.deleteEmployee = async function (id) {
 };
 
 window.toggleEmployee = async function (id, active) {
-  await updateDoc(doc(db, "employees", id), {
-    active: !active
-  });
+  await updateDoc(doc(db, "employees", id), { active: !active });
 };
 
 window.markEntry = async function () {
   if (!currentEmployee) return;
-
   if (getOpenRecord(currentEmployee.id)) {
     alert("Aaj entry already active hai");
     return;
   }
-
   await addDoc(collection(db, "attendance"), {
     empId: currentEmployee.id,
     name: currentEmployee.name,
@@ -348,91 +326,63 @@ window.markEntry = async function () {
     breaks: [],
     createdAt: nowISO()
   });
-
   alert("Entry marked");
 };
 
 window.startBreak = async function () {
   const r = getOpenRecord(currentEmployee?.id);
-
   if (!r) {
     alert("Pehle Entry karo");
     return;
   }
-
   const breaks = r.breaks || [];
   const activeBreak = breaks.find(b => !b.end);
-
   if (activeBreak) {
     alert("Break already running hai");
     return;
   }
-
-  breaks.push({
-    start: nowISO(),
-    end: ""
-  });
-
-  await updateDoc(doc(db, "attendance", r.id), {
-    breaks
-  });
-
+  breaks.push({ start: nowISO(), end: "" });
+  await updateDoc(doc(db, "attendance", r.id), { breaks });
   alert("Break Started");
 };
 
 window.endBreak = async function () {
   const r = getOpenRecord(currentEmployee?.id);
-
   if (!r) {
     alert("Pehle Entry karo");
     return;
   }
-
   const breaks = r.breaks || [];
   const activeBreak = breaks.find(b => !b.end);
-
   if (!activeBreak) {
     alert("Koi active break nahi hai");
     return;
   }
-
   activeBreak.end = nowISO();
-
-  await updateDoc(doc(db, "attendance", r.id), {
-    breaks
-  });
-
+  await updateDoc(doc(db, "attendance", r.id), { breaks });
   alert("Break Ended");
 };
 
 window.markExit = async function () {
   const r = getOpenRecord(currentEmployee?.id);
-
   if (!r) {
     alert("Pehle Entry karo");
     return;
   }
-
   if ((r.breaks || []).some(b => !b.end)) {
     alert("Pehle break end karo");
     return;
   }
-
-  await updateDoc(doc(db, "attendance", r.id), {
-    exit: nowISO()
-  });
-
+  await updateDoc(doc(db, "attendance", r.id), { exit: nowISO() });
   alert("Exit marked");
 };
 
 window.submitWorkUpdate = async function () {
   const text = $("workText").value.trim();
-
   if (!text) {
     alert("Work update likho");
     return;
   }
-
   await addDoc(collection(db, "workUpdates"), {
     empId: currentEmployee.id,
     name: currentEmployee.name,
@@ -440,7 +390,6 @@ window.submitWorkUpdate = async function () {
     text,
     createdAt: nowISO()
   });
-
   $("workText").value = "";
   alert("Work update submitted");
 };
@@ -448,12 +397,10 @@ window.submitWorkUpdate = async function () {
 window.submitLeave = async function () {
   const date = $("leaveDate").value;
   const reason = $("leaveReason").value.trim();
-
   if (!date || !reason) {
     alert("Date aur reason likho");
     return;
   }
-
   await addDoc(collection(db, "leaves"), {
     empId: currentEmployee.id,
     name: currentEmployee.name,
@@ -462,43 +409,40 @@ window.submitLeave = async function () {
     status: "Pending",
     createdAt: nowISO()
   });
-
   $("leaveDate").value = "";
   $("leaveReason").value = "";
   alert("Leave request submitted");
 };
 
 window.approveLeave = async function (id) {
-  await updateDoc(doc(db, "leaves", id), {
-    status: "Approved"
-  });
+  await updateDoc(doc(db, "leaves", id), { status: "Approved" });
 };
 
 window.rejectLeave = async function (id) {
-  await updateDoc(doc(db, "leaves", id), {
-    status: "Rejected"
-  });
+  await updateDoc(doc(db, "leaves", id), { status: "Rejected" });
 };
+
 window.dismissLeaveAlert = async function(id){
-
-    await updateDoc(
-        doc(db,"leaves",id),
-        {
-            dismissed:true
-        }
-    );
-
+    await updateDoc(doc(db,"leaves",id), { dismissed: true });
 };
+
 window.deleteTask = async function(id){
   if(confirm("Ye task delete karna hai?")){
     await deleteDoc(doc(db, "tasks", id));
   }
 };
+
 window.assignTask = async function () {
   const empId = $("taskEmployee").value;
   const emp = employees.find(e => e.id === empId);
   const date = $("taskDate").value || todayKey();
   const text = $("taskText").value.trim();
+  
+  const business = $("taskBusiness").value.trim();
+  const department = $("taskDepartment").value;
+  const taskCode = $("taskCode").value.trim();
+  const deadline = $("taskDeadline").value;
+  const priority = $("taskPriority").value;
 
   if (!emp || !text) {
     alert("Employee aur task select karo");
@@ -510,22 +454,35 @@ window.assignTask = async function () {
     name: emp.name,
     date,
     text,
+    business: business || "-",
+    department: department || "-",
+    taskCode: taskCode || "-",
+    deadline: deadline || "-",
+    priority: priority || "Medium",
     status: "Pending",
     createdAt: nowISO()
   });
 
   $("taskText").value = "";
+  $("taskBusiness").value = "";
+  $("taskDepartment").value = "";
+  $("taskCode").value = "";
+  $("taskDeadline").value = "";
+  $("taskPriority").value = "Medium";
+  
+  alert("Task successfully assign ho gaya!");
 };
 
 window.markTaskDone = async function (id) {
- await updateDoc(doc(db,"tasks",id),{
-  status:"Done",
-  completedAt: nowISO()
-});
+  await updateDoc(doc(db,"tasks",id), {
+    status: "Done",
+    completedAt: nowISO()
+  });
   renderMyTasks();
-renderAchievements();
-renderRewards();
+  renderAchievements();
+  renderRewards();
 };
+
 window.showTodayTasks = function(){
   myTaskMode = "today";
   if($("myTaskDate")) $("myTaskDate").value = todayKey();
@@ -537,6 +494,7 @@ window.showPendingTasks = function(){
   if($("myTaskDate")) $("myTaskDate").value = "";
   renderMyTasks();
 };
+
 window.showCompletedTasks = function(){
     myTaskMode = "completed";
     if($("myTaskDate")) $("myTaskDate").value = "";
@@ -561,7 +519,6 @@ window.addAdminNote = async function () {
     text,
     createdAt: nowISO()
   });
-
   $("noteText").value = "";
 };
 
@@ -586,7 +543,6 @@ window.addAnnouncement = async function () {
   $("announceTitle").value = "";
   $("announceText").value = "";
   $("announceExpiry").value = "";
-
   alert("Announcement published");
 };
 
@@ -609,7 +565,6 @@ window.addDocument = async function () {
     date: todayKey(),
     createdAt: nowISO()
   });
-
   $("docType").value = "";
   $("docUrl").value = "";
 };
@@ -647,10 +602,8 @@ window.applyFilters = function () {
 window.clearFilters = function () {
   filterDate = "";
   filterMonth = "";
-
   $("filterDate").value = "";
   $("filterMonth").value = "";
-
   renderAll();
 };
 
@@ -670,61 +623,45 @@ function setOptions() {
   ["taskEmployee", "messageEmp", "noteEmployee", "payrollEmployee", "docEmployee"].forEach(id => {
     if ($(id)) $(id).innerHTML = options;
   });
- if ($("newEmpDepartment")) {
-  $("newEmpDepartment").innerHTML = departments.map(d => `
-    <label class="dept-check">
-      <input type="checkbox" value="${d.name}">
-      <span>${d.name}</span>
-    </label>
-  `).join("");
-}
+
+  if ($("taskDepartment")) {
+    $("taskDepartment").innerHTML = `<option value="">Select Department</option>` + departments.map(d => `
+      <option value="${d.name}">${d.name}</option>
+    `).join("");
+  }
+
+  if ($("newEmpDepartment")) {
+    $("newEmpDepartment").innerHTML = departments.map(d => `
+      <label class="dept-check">
+        <input type="checkbox" value="${d.name}">
+        <span>${d.name}</span>
+      </label>
+    `).join("");
+  }
 }
 
 window.addDepartment = async function () {
   const name = $("newDepartmentName").value.trim();
-
   if (!name) {
     alert("Department name likho");
     return;
   }
-
   await addDoc(collection(db, "departments"), {
     name,
     createdAt: nowISO()
   });
-
   $("newDepartmentName").value = "";
   alert("Department added");
 };
 
 window.deleteDepartment = async function(name){
-
-    if(!confirm(`Delete department "${name}" ?`)) return;
-
-    const found = departments.find(d => d.name === name);
-
-    if(!found){
-        alert("Department not found");
-        return;
-    }
-
-    await deleteDoc(doc(db,"departments",found.id));
-
-    alert("Department deleted");
-}
-
-window.deleteDepartment = async function(name){
-  if(!confirm("Delete this department?")) return;
-
+  if(!confirm(`Delete department "${name}" ?`)) return;
   const found = departments.find(d => d.name === name);
-
   if(!found){
     alert("Department not found");
     return;
   }
-
   await deleteDoc(doc(db, "departments", found.id));
-
   alert("Department deleted");
 };
 
@@ -734,45 +671,29 @@ window.renderDepartmentOverview = function () {
   if (!box || !filter) return;
 
   const oldSelected = filter.value;
-
-  filter.innerHTML =
-    `<option value="">All Departments</option>` +
-    departments.map(d => `<option value="${d.name}">${d.name}</option>`).join("");
-
+  filter.innerHTML = `<option value="">All Departments</option>` + departments.map(d => `<option value="${d.name}">${d.name}</option>`).join("");
   filter.value = oldSelected;
 
   const selected = filter.value;
-
-  const deptList = selected
-    ? departments.filter(d => d.name === selected)
-    : departments;
+  const deptList = selected ? departments.filter(d => d.name === selected) : departments;
 
   box.innerHTML = `
     <div class="dept-summary">
-      <div>
-        <span>Total Departments</span>
-        <strong>${departments.length}</strong>
-      </div>
+      <div><span>Total Departments</span><strong>${departments.length}</strong></div>
     </div>
-
     ${
       deptList.length
         ? deptList.map(d => {
-            const arr = employees.filter(e =>
-              (e.departments || [e.department || ""]).includes(d.name)
-            );
-
+            const arr = employees.filter(e => (e.departments || [e.department || ""]).includes(d.name));
             return `
               <div class="dept-card">
                 <div class="dept-header">
                   <strong>${d.name}</strong>
-
                   <div style="display:flex;gap:10px;align-items:center;">
                     <span>${arr.length} Employees</span>
                     <button class="danger-btn" onclick="deleteDepartment('${d.name}')">Delete</button>
                   </div>
                 </div>
-
                 ${
                   arr.length
                     ? arr.map(e => `
@@ -793,26 +714,17 @@ window.renderDepartmentOverview = function () {
 
 function renderTodayStatus() {
   if (!currentEmployee || !$("todayStatus")) return;
-
-  const r =
-    getOpenRecord(currentEmployee.id) ||
-    records.find(x => x.empId === currentEmployee.id && x.date === todayKey());
-
+  const r = getOpenRecord(currentEmployee.id) || records.find(x => x.empId === currentEmployee.id && x.date === todayKey());
   if (!r) {
     $("todayStatus").innerHTML = "Aaj abhi entry nahi hui.";
     return;
   }
-
   const breaks = r.breaks || [];
   const activeBreak = breaks.find(b => !b.end);
 
   $("todayStatus").innerHTML = `
     <b>Today Status</b><br>
-    Entry: ${showTime(r.entry)} ${
-  isLate(r)
-    ? `<b class="badge red-badge">Late ${lateMinutes(r)} min</b>`
-    : `<b class="badge green-badge">On Time</b>`
-}<br>
+    Entry: ${showTime(r.entry)} ${isLate(r) ? `<b class="badge red-badge">Late ${lateMinutes(r)} min</b>` : `<b class="badge green-badge">On Time</b>`}<br>
     Exit: ${showTime(r.exit)}<br>
     Break Count: ${breaks.length}<br>
     Total Break: ${fmt(calcBreak(breaks))} ${isLateBreak(r) ? "<b class='badge red-badge'>Break Limit Cross</b>" : ""}<br>
@@ -823,20 +735,10 @@ function renderTodayStatus() {
 
 function renderEmployeeSummary() {
   if (!currentEmployee || !$("employeeSummary")) return;
-
   const month = monthKey();
-  const present = records.filter(r =>
-    r.empId === currentEmployee.id &&
-    r.date?.startsWith(month)
-  ).length;
-
+  const present = records.filter(r => r.empId === currentEmployee.id && r.date?.startsWith(month)).length;
   const approved = approvedLeaves(currentEmployee.id, month);
-  const pending = leaves.filter(l =>
-    l.empId === currentEmployee.id &&
-    l.status === "Pending" &&
-    l.date?.startsWith(month)
-  ).length;
-
+  const pending = leaves.filter(l => l.empId === currentEmployee.id && l.status === "Pending" && l.date?.startsWith(month)).length;
   const limit = empLeaveLimit(currentEmployee.id);
 
   $("employeeSummary").innerHTML = `
@@ -846,29 +748,19 @@ function renderEmployeeSummary() {
     <div>Extra Leave: <b>${Math.max(0, approved - limit)}</b></div>
   `;
 }
+
 function renderEmployeeProfileCard() {
   if (!currentEmployee || !$("employeeProfileCard")) return;
-
   const month = monthKey();
-
-  const myRecords = records.filter(r =>
-    r.empId === currentEmployee.id &&
-    r.date?.startsWith(month)
-  );
-
+  const myRecords = records.filter(r => r.empId === currentEmployee.id && r.date?.startsWith(month));
   const present = myRecords.length;
-
   const approved = approvedLeaves(currentEmployee.id, month);
   const limit = empLeaveLimit(currentEmployee.id);
   const remaining = Math.max(0, limit - approved);
-
   const lateCount = myRecords.filter(isLate).length;
 
   const totalTasks = tasks.filter(t => t.empId === currentEmployee.id).length;
-  const doneTasks = tasks.filter(t =>
-    t.empId === currentEmployee.id &&
-    t.status === "Done"
-  ).length;
+  const doneTasks = tasks.filter(t => t.empId === currentEmployee.id && t.status === "Done").length;
 
   const attendancePercent = Math.min(100, Math.round((present / 30) * 100));
   const leavePercent = limit ? Math.min(100, Math.round((approved / limit) * 100)) : 0;
@@ -883,72 +775,37 @@ function renderEmployeeProfileCard() {
         <span>Code: ${currentEmployee.code}</span>
       </div>
     </div>
-
     <div class="profile-metrics">
-      <div>
-        <b>${attendancePercent}%</b>
-        <span>Attendance</span>
-        <i><em style="width:${attendancePercent}%"></em></i>
-      </div>
-
-      <div>
-        <b>${remaining}</b>
-        <span>Leave Left</span>
-        <i><em style="width:${100 - leavePercent}%"></em></i>
-      </div>
-
-      <div>
-        <b>${taskPercent}%</b>
-        <span>Task Done</span>
-        <i><em style="width:${taskPercent}%"></em></i>
-      </div>
-
-      <div>
-        <b>${lateCount}</b>
-        <span>Late This Month</span>
-        <i><em style="width:${Math.min(100, lateCount * 10)}%"></em></i>
-      </div>
+      <div><b>${attendancePercent}%</b><span>Attendance</span><i><em style="width:${attendancePercent}%"></em></i></div>
+      <div><b>${remaining}</b><span>Leave Left</span><i><em style="width:${100 - leavePercent}%"></em></i></div>
+      <div><b>${taskPercent}%</b><span>Task Done</span><i><em style="width:${taskPercent}%"></em></i></div>
+      <div><b>${lateCount}</b><span>Late This Month</span><i><em style="width:${Math.min(100, lateCount * 10)}%"></em></i></div>
     </div>
   `;
 }
+
 function renderAchievements() {
   if (!currentEmployee || !$("achievementBox")) return;
-
   const month = monthKey();
-
   const completed = tasks
-    .filter(t =>
-      t.empId === currentEmployee.id &&
-      t.status === "Done" &&
-      t.date &&
-      t.date.startsWith(month)
-    )
-    .sort((a, b) =>
-      new Date(b.completedAt || 0) - new Date(a.completedAt || 0)
-    )
+    .filter(t => t.empId === currentEmployee.id && t.status === "Done" && t.date && t.date.startsWith(month))
+    .sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0))
     .slice(0, 3);
 
   if (!completed.length) {
+    $("achievementBox").innerHTML = `<h3>🏆 Recent Achievements</h3><p>No completed tasks yet.</p>`;
+    return;
+  }
+
   $("achievementBox").innerHTML = `
     <h3>🏆 Recent Achievements</h3>
-    <p>No completed tasks yet.</p>
-  `;
-  return;
-}
-
-$("achievementBox").innerHTML = `
-  <h3>🏆 Recent Achievements</h3>
-  ${completed.map(t => `
+    ${completed.map(t => `
       <div class="achievement-item">
         <div class="achievement-icon">🏆</div>
         <div class="achievement-content">
           <div class="achievement-title">${t.text}</div>
-          <div class="achievement-time">
-            Completed: ${t.completedAt ? new Date(t.completedAt).toLocaleString() : "-"}
-          </div>
-          <div class="achievement-msg">
-            Great job! Keep up the excellent work 🚀
-          </div>
+          <div class="achievement-time">Completed: ${t.completedAt ? new Date(t.completedAt).toLocaleString() : "-"}</div>
+          <div class="achievement-msg">Great job! Keep up the excellent work 🚀</div>
         </div>
       </div>
     `).join("")}
@@ -959,23 +816,16 @@ function getRewardPoints(empId) {
   const doneTasks = tasks.filter(t => t.empId === empId && t.status === "Done").length;
   const lateCount = records.filter(r => r.empId === empId && isLate(r)).length;
   const approvedLeavesCount = leaves.filter(l => l.empId === empId && l.status === "Approved").length;
-
   const streak = getAttendanceStreak(empId);
 
-let streakBonus = 0;
+  let streakBonus = 0;
+  if(streak >= 30) streakBonus = 50;
+  else if(streak >= 15) streakBonus = 25;
+  else if(streak >= 7) streakBonus = 10;
 
-if(streak >= 30){
-  streakBonus = 50;
-}
-else if(streak >= 15){
-  streakBonus = 25;
-}
-else if(streak >= 7){
-  streakBonus = 10;
+  return Math.max(0, (doneTasks * 10) + streakBonus - (lateCount * 2) - approvedLeavesCount);
 }
 
-return Math.max(0, (doneTasks * 10) + streakBonus - (lateCount * 2) - approvedLeavesCount);
-}
 function getEmployeeRank(points){
   if(points >= 250) return "🏆 Legend";
   if(points >= 200) return "🔥 Elite Employee";
@@ -983,20 +833,14 @@ function getEmployeeRank(points){
   if(points >= 100) return "🚀 Rising Star";
   return "🌱 Beginner";
 }
+
 function getAttendanceStreak(empId){
-  const dates = records
-    .filter(r => r.empId === empId)
-    .map(r => r.date)
-    .filter(Boolean);
-
+  const dates = records.filter(r => r.empId === empId).map(r => r.date).filter(Boolean);
   const uniqueDates = [...new Set(dates)];
-
   let streak = 0;
   let d = new Date();
-
   while(true){
     const key = d.toLocaleDateString("en-CA");
-
     if(uniqueDates.includes(key)){
       streak++;
       d.setDate(d.getDate() - 1);
@@ -1004,159 +848,80 @@ function getAttendanceStreak(empId){
       break;
     }
   }
-
   return streak;
 }
 
 function renderRewards() {
   if (!currentEmployee || !$("employeeRewardsBox")) return;
-
   const points = getRewardPoints(currentEmployee.id);
   let badge = "";
+  if(points >= 300) badge = "🎁 Gift Voucher Unlocked";
+  else if(points >= 250) badge = "🏖️ Paid Leave Unlocked";
+  else if(points >= 200) badge = "💵 ₹1000 Bonus Unlocked";
+  else if(points >= 150) badge = "💰 ₹500 Bonus Unlocked";
+  else if(points >= 100) badge = "🏆 Employee of Month Eligible";
 
-if(points >= 300){
-  badge = "🎁 Gift Voucher Unlocked";
-}
-else if(points >= 250){
-  badge = "🏖️ Paid Leave Unlocked";
-}
-else if(points >= 200){
-  badge = "💵 ₹1000 Bonus Unlocked";
-}
-else if(points >= 150){
-  badge = "💰 ₹500 Bonus Unlocked";
-}
-else if(points >= 100){
-  badge = "🏆 Employee of Month Eligible";
-}
-const rank = getEmployeeRank(points);
+  const rank = getEmployeeRank(points);
   const streak = getAttendanceStreak(currentEmployee.id);
   let nextReward = "";
-let nextPoints = 0;
+  let nextPoints = 0;
 
-if(points < 100){
-  nextReward = "Employee of Month Certificate";
-  nextPoints = 100;
-}
-else if(points < 150){
-  nextReward = "₹500 Bonus";
-  nextPoints = 150;
-}
-else if(points < 200){
-  nextReward = "₹1000 Bonus";
-  nextPoints = 200;
-}
-else if(points < 250){
-  nextReward = "1 Paid Leave";
-  nextPoints = 250;
-}
-else if(points < 300){
-  nextReward = "Gift Voucher";
-  nextPoints = 300;
-}
-else{
-  nextReward = "Star Performer Trophy";
-  nextPoints = 500;
-}
+  if(points < 100) { nextReward = "Employee of Month Certificate"; nextPoints = 100; }
+  else if(points < 150) { nextReward = "₹500 Bonus"; nextPoints = 150; }
+  else if(points < 200) { nextReward = "₹1000 Bonus"; nextPoints = 200; }
+  else if(points < 250) { nextReward = "1 Paid Leave"; nextPoints = 250; }
+  else if(points < 300) { nextReward = "Gift Voucher"; nextPoints = 300; }
+  else { nextReward = "Star Performer Trophy"; nextPoints = 500; }
 
-const remaining = Math.max(0, nextPoints - points);
-const progress = Math.min(100, (points / nextPoints) * 100);
+  const remaining = Math.max(0, nextPoints - points);
+  const progress = Math.min(100, (points / nextPoints) * 100);
 
-let unlockedReward = "";
+  let unlockedReward = "";
+  if(points >= 300) unlockedReward = "🏆 Gift Voucher Unlocked";
+  else if(points >= 250) unlockedReward = "🌴 1 Paid Leave Unlocked";
+  else if(points >= 200) unlockedReward = "💰 ₹1000 Bonus Unlocked";
+  else if(points >= 150) unlockedReward = "💵 ₹500 Bonus Unlocked";
+  else if(points >= 100) unlockedReward = "🏅 Employee of Month Certificate Unlocked";
 
-if(points >= 300){
-  unlockedReward = "🏆 Gift Voucher Unlocked";
-}
-else if(points >= 250){
-  unlockedReward = "🌴 1 Paid Leave Unlocked";
-}
-else if(points >= 200){
-  unlockedReward = "💰 ₹1000 Bonus Unlocked";
-}
-else if(points >= 150){
-  unlockedReward = "💵 ₹500 Bonus Unlocked";
-}
-else if(points >= 100){
-  unlockedReward = "🏅 Employee of Month Certificate Unlocked";
-}
   $("employeeRewardsBox").innerHTML = `
-<div class="card reward-card">
-
-<h3>⭐ Reward Points</h3>
-<h4>${rank}</h4>
-<h4>🔥 Current Streak: ${streak} Days</h4>
-<div class="reward-points">${points}</div>
-
-<p>Task Done +10 • Late -2 • Approved Leave -1</p>
-
-${badge ? `
-<div class="reward-badge">
-  ${badge}
-</div>
-` : ""}
-
-<hr style="margin:15px 0">
-
-<h4>🎯 Next Reward</h4>
-
-<p><b>${nextReward}</b></p>
-
-<p>${remaining} Points Remaining</p>
-${unlockedReward ? `
-<div class="reward-unlocked">
-${unlockedReward}
-</div>
-` : ""}
-
-<div class="reward-progress">
-<span style="width:${progress}%"></span>
-</div>
-</div>
-`;
+    <div class="card reward-card">
+      <h3>⭐ Reward Points</h3>
+      <h4>${rank}</h4>
+      <h4>🔥 Current Streak: ${streak} Days</h4>
+      <div class="reward-points">${points}</div>
+      <p>Task Done +10 • Late -2 • Approved Leave -1</p>
+      ${badge ? `<div class="reward-badge">${badge}</div>` : ""}
+      <hr style="margin:15px 0">
+      <h4>🎯 Next Reward</h4>
+      <p><b>${nextReward}</b></p>
+      <p>${remaining} Points Remaining</p>
+      ${unlockedReward ? `<div class="reward-unlocked">${unlockedReward}</div>` : ""}
+      <div class="reward-progress"><span style="width:${progress}%"></span></div>
+    </div>
+  `;
 }
 
 function renderEmployeeOfMonth() {
   if (!$("employeeOfMonthBox")) return;
-
   const month = monthKey();
-
   const ranked = employees.map(emp => {
-    const done = tasks.filter(t =>
-      t.empId === emp.id &&
-      t.status === "Done" &&
-      t.date &&
-      t.date.startsWith(month)
-    ).length;
-
-    const late = records.filter(r =>
-      r.empId === emp.id &&
-      r.date &&
-      r.date.startsWith(month) &&
-      isLate(r)
-    ).length;
-
+    const done = tasks.filter(t => t.empId === emp.id && t.status === "Done" && t.date && t.date.startsWith(month)).length;
+    const late = records.filter(r => r.empId === emp.id && r.date && r.date.startsWith(month) && isLate(r)).length;
     const points = getRewardPoints(emp.id);
     const score = (done * 10) - (late * 2) + points;
-
     return { emp, done, late, points, score };
   }).sort((a, b) => b.score - a.score);
 
   const top = ranked[0];
-
   if (!top || top.score <= 0) {
-    $("employeeOfMonthBox").innerHTML = `
-      <h3>🏆 Employee of the Month</h3>
-      <p>No performance data available yet.</p>
-    `;
+    $("employeeOfMonthBox").innerHTML = `<h3>🏆 Employee of the Month</h3><p>No performance data available yet.</p>`;
     return;
   }
 
   $("employeeOfMonthBox").innerHTML = `
     <h3>🏆 Employee of the Month</h3>
     <div class="eom-card">
-      <div class="eom-avatar">
-        ${top.emp.photo ? `<img src="${top.emp.photo}">` : "👤"}
-      </div>
+      <div class="eom-avatar">${top.emp.photo ? `<img src="${top.emp.photo}">` : "👤"}</div>
       <div>
         <h2>${top.emp.name}</h2>
         <p>${top.emp.designation || "Employee"} • ${(top.emp.departments || [top.emp.department || "General"]).join(", ")}</p>
@@ -1171,215 +936,92 @@ function renderEmployeeOfMonth() {
 }
 
 function renderLeaderboard() {
-
   if (!$("leaderboardBox")) return;
-
-  const ranked = employees.map(emp => {
-
-    const points = getRewardPoints(emp.id);
-
-    return {
-      name: emp.name,
-      points
-    };
-
-  }).sort((a,b) => b.points - a.points);
-
+  const ranked = employees.map(emp => ({ name: emp.name, points: getRewardPoints(emp.id) })).sort((a,b) => b.points - a.points);
   $("leaderboardBox").innerHTML = `
-
     <h3>🏆 Top Employees</h3>
-
     ${ranked.slice(0,5).map((e,index) => `
-
       <div class="leaderboard-row">
-
-        <span>
-          ${index === 0 ? "🥇" :
-            index === 1 ? "🥈" :
-            index === 2 ? "🥉" : "⭐"}
-
-          ${e.name}
-        </span>
-
+        <span>${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "⭐"} ${e.name}</span>
         <b>${e.points} pts</b>
-
       </div>
-
     `).join("")}
-
   `;
 }
 
 function renderEmployeeLeaveAlerts() {
   if (!currentEmployee || !$("employeeLeaveAlerts")) return;
-
-  const myUpdatedLeaves = leaves
-    .filter(l =>
-l.empId === currentEmployee.id &&
-l.status !== "Pending" &&
-!l.dismissed
-)
-    .slice(0, 3);
-
- $("employeeLeaveAlerts").innerHTML = myUpdatedLeaves.map(l => `
-<div class="leave-alert-item">
-
-<span>
-${l.status === "Approved" ? "✅" : "❌"}
-Your leave for <b>${l.date}</b> has been <b>${l.status}</b>
-</span>
-
-<button
-class="dismiss-alert"
-onclick="dismissLeaveAlert('${l.id}')">
-✖
-</button>
-
-</div>
-`).join("");
+  const myUpdatedLeaves = leaves.filter(l => l.empId === currentEmployee.id && l.status !== "Pending" && !l.dismissed).slice(0, 3);
+  $("employeeLeaveAlerts").innerHTML = myUpdatedLeaves.map(l => `
+    <div class="leave-alert-item">
+      <span>${l.status === "Approved" ? "✅" : "❌"} Your leave for <b>${l.date}</b> has been <b>${l.status}</b></span>
+      <button class="dismiss-alert" onclick="dismissLeaveAlert('${l.id}')">✖</button>
+    </div>
+  `).join("");
 }
+
 function renderEmployeeNotificationCenter(){
-
     if(!currentEmployee || !$("notificationCenter")) return;
-
     const notices = [];
-
-    const approvedLeave = leaves.find(l =>
-        l.empId === currentEmployee.id &&
-        l.status === "Approved"
-    );
-
+    const approvedLeave = leaves.find(l => l.empId === currentEmployee.id && l.status === "Approved");
     if(approvedLeave){
-        notices.push(`
-            <div class="notification-card">
-                <h4>✅ Leave Approved</h4>
-                <p>Your leave request has been approved.</p>
-            </div>
-        `);
+        notices.push(`<div class="notification-card"><h4>✅ Leave Approved</h4><p>Your leave request has been approved.</p></div>`);
     }
-
-    const doneTask = tasks.find(t =>
-        t.empId === currentEmployee.id &&
-        t.status === "Done"
-    );
-
+    const doneTask = tasks.find(t => l => t.empId === currentEmployee.id && t.status === "Done");
     if(doneTask){
-        notices.push(`
-            <div class="notification-card">
-                <h4>🏆 Task Completed</h4>
-                <p>Great work! Keep completing tasks.</p>
-            </div>
-        `);
+        notices.push(`<div class="notification-card"><h4>🏆 Task Completed</h4><p>Great work! Keep completing tasks.</p></div>`);
     }
-
-    $("notificationCenter").innerHTML =
-        notices.length
-        ? notices.join("")
-        : "";
+    $("notificationCenter").innerHTML = notices.length ? notices.join("") : "";
 }
+
 function renderBirthdays() {
   const today = todayKey().slice(5);
   const birthdayEmployees = employees.filter(e => e.dob && e.dob.slice(5) === today);
-
-  const html = birthdayEmployees.length
-    ? `🎂 Birthday Today: <b>${birthdayEmployees.map(e => e.name).join(", ")}</b>`
-    : "";
-
+  const html = birthdayEmployees.length ? `🎂 Birthday Today: <b>${birthdayEmployees.map(e => e.name).join(", ")}</b>` : "";
   if ($("adminBirthdayBox")) $("adminBirthdayBox").innerHTML = html;
   if ($("birthdayBox")) $("birthdayBox").innerHTML = html;
 }
 
 function renderAnnouncements() {
-
   const today = todayKey();
-
-  const activeAnnouncements = announcements.filter(a => {
-    if (!a.expiry) return false;
-    return a.expiry >= today;
-  });
-
+  const activeAnnouncements = announcements.filter(a => a.expiry && a.expiry >= today);
   if ($("employeeAnnouncements")) {
-    $("employeeAnnouncements").innerHTML =
-      activeAnnouncements.slice(0, 3).map(a => `
-        <div>
-          <b>${a.title}</b><br>
-          ${a.text}<br>
-          <small>Valid till: ${a.expiry}</small>
-        </div>
-      `).join("") || "";
+    $("employeeAnnouncements").innerHTML = activeAnnouncements.slice(0, 3).map(a => `
+        <div><b>${a.title}</b><br>${a.text}<br><small>Valid till: ${a.expiry}</small></div>
+      `).join("");
   }
-
   if ($("announcementTable")) {
     $("announcementTable").innerHTML = announcements.map(a => `
-      <tr>
-        <td>${a.date || "-"}</td>
-        <td>${a.title || "-"}</td>
-        <td>${a.text || "-"}</td>
-      </tr>
-    `).join("");
-  }
-
-  if ($("announcementTable")) {
-    $("announcementTable").innerHTML = announcements.map(a => `
-      <tr>
-        <td>${a.date}</td>
-        <td>${a.title}</td>
-        <td>${a.text}</td>
-      </tr>
+      <tr><td>${a.date || "-"}</td><td>${a.title || "-"}</td><td>${a.text || "-"}</td></tr>
     `).join("");
   }
 }
+
 function renderEmployeeMessages() {
-
   if (!$("employeeMessages")) return;
-
-  const employeeMsgs = messages
-    .filter(m => m.empId === currentEmployee?.id)
-    .slice()
-    .reverse()
-    .slice(0,5);
-
+  const employeeMsgs = messages.filter(m => m.empId === currentEmployee?.id).slice().reverse().slice(0,5);
   if (!employeeMsgs.length) {
     $("employeeMessages").innerHTML = "";
     return;
   }
-
   $("employeeMessages").innerHTML = `
     <div class="card">
       <h3>📨 Messages From Admin</h3>
-
       ${employeeMsgs.map(m => `
-        <div class="message-item">
-          <b>${m.title}</b><br>
-          ${m.text}<br>
-          <small>${m.date}</small>
-        </div>
+        <div class="message-item"><b>${m.title}</b><br>${m.text}<br><small>${m.date}</small></div>
       `).join("")}
     </div>
   `;
 }
+
 function renderNotifications() {
   const items = [];
-
-  announcements
-  .filter(a => a.expiry && a.expiry >= todayKey())
-  .slice(0, 5)
-  .forEach(a => {
-    items.push(`📢 ${a.title}`);
-  });
-  
+  announcements.filter(a => a.expiry && a.expiry >= todayKey()).slice(0, 5).forEach(a => items.push(`📢 ${a.title}`));
   if (currentEmployee) {
-    tasks
-      .filter(t => t.empId === currentEmployee.id && t.status === "Pending")
-      .forEach(t => items.push(`✅ Task: ${t.text}`));
-
-    leaves
-      .filter(l => l.empId === currentEmployee.id && l.status !== "Pending")
-      .forEach(l => items.push(`📝 Leave ${l.status}: ${l.date}`));
+    tasks.filter(t => t.empId === currentEmployee.id && t.status === "Pending").forEach(t => items.push(`✅ Task: ${t.text}`));
+    leaves.filter(l => l.empId === currentEmployee.id && l.status !== "Pending").forEach(l => items.push(`📝 Leave ${l.status}: ${l.date}`));
   }
-
   if ($("notifyCount")) $("notifyCount").innerText = items.length;
-
   if ($("notificationList")) {
     $("notificationList").innerHTML = items.map(i => `<p>${i}</p>`).join("") || "<p>No notifications</p>";
   }
@@ -1387,7 +1029,6 @@ function renderNotifications() {
 
 function renderCalendar() {
   if (!$("calendarBox")) return;
-
   const month = filterMonth || monthKey();
   const year = Number(month.slice(0, 4));
   const monthNum = Number(month.slice(5, 7));
@@ -1395,35 +1036,20 @@ function renderCalendar() {
 
   $("calendarBox").innerHTML = employees.map(emp => {
     let cells = "";
-
     for (let d = 1; d <= days; d++) {
       const date = `${month}-${String(d).padStart(2, "0")}`;
-
       const present = records.some(r => r.empId === emp.id && r.date === date);
-      const leave = leaves.some(l =>
-        l.empId === emp.id &&
-        l.date === date &&
-        l.status === "Approved"
-      );
-
+      const leave = leaves.some(l => l.empId === emp.id && l.date === date && l.status === "Approved");
       const cls = present ? "present" : leave ? "leave" : "absent";
       const txt = present ? "P" : leave ? "L" : "A";
-
       cells += `<span class="${cls}" title="${date}">${txt}</span>`;
     }
-
-    return `
-      <div class="calendar-row">
-        <b>${emp.name}</b>
-        <div>${cells}</div>
-      </div>
-    `;
+    return `<div class="calendar-row"><b>${emp.name}</b><div>${cells}</div></div>`;
   }).join("");
 }
 
 function renderCharts(todayRecords) {
   if (!$("chartBox")) return;
-
   const activeEmployees = employees.filter(e => e.active !== false).length;
   const present = new Set(todayRecords.map(r => r.empId)).size;
   const absent = Math.max(0, activeEmployees - present);
@@ -1435,59 +1061,29 @@ function renderCharts(todayRecords) {
 
   const totalTasks = tasks.length || 1;
   const doneTasks = tasks.filter(t => t.status === "Done").length;
-  const pendingTasks = tasks.filter(t => t.status === "Pending").length;
 
   const lateToday = todayRecords.filter(isLate).length;
   const lateBreaks = todayRecords.filter(isLateBreak).length;
 
-  const departments = {};
+  const departmentsObj = {};
   employees.forEach(e => {
     const dept = e.department || "General";
-    departments[dept] = (departments[dept] || 0) + 1;
+    departmentsObj[dept] = (departmentsObj[dept] || 0) + 1;
   });
 
-  function percent(value, total) {
-    return total ? Math.min(100, Math.round((value / total) * 100)) : 0;
-  }
-
+  function percent(value, total) { return total ? Math.min(100, Math.round((value / total) * 100)) : 0; }
   function donut(title, value, total, sub) {
     const p = percent(value, total);
-
-    return `
-      <div class="premium-chart-card">
-        <div class="premium-donut" style="--p:${p}">
-          <span>${p}%</span>
-        </div>
-        <h4>${title}</h4>
-        <p>${value} / ${total}</p>
-        <small>${sub}</small>
-      </div>
-    `;
+    return `<div class="premium-chart-card"><div class="premium-donut" style="--p:${p}"><span>${p}%</span></div><h4>${title}</h4><p>${value} / ${total}</p><small>${sub}</small></div>`;
   }
-
   function bar(title, rows) {
-    return `
-      <div class="premium-chart-card wide-chart">
-        <h4>${title}</h4>
-        ${rows.map(r => {
+    return `<div class="premium-chart-card wide-chart"><h4>${title}</h4>${rows.map(r => {
           const p = percent(r.value, r.total);
-          return `
-            <div class="premium-bar-row">
-              <span>${r.label}</span>
-              <div class="premium-bar"><i style="width:${p}%"></i></div>
-              <b>${r.value}</b>
-            </div>
-          `;
-        }).join("")}
-      </div>
-    `;
+          return `<div class="premium-bar-row"><span>${r.label}</span><div class="premium-bar"><i style="width:${p}%"></i></div><b>${r.value}</b></div>`;
+        }).join("")}</div>`;
   }
 
-  const deptRows = Object.entries(departments).map(([label, value]) => ({
-    label,
-    value,
-    total: employees.length || 1
-  }));
+  const deptRows = Object.entries(departmentsObj).map(([label, value]) => ({ label, value, total: employees.length || 1 }));
 
   $("chartBox").innerHTML = `
     ${donut("Today Attendance", present, activeEmployees || 1, "Present employee ratio")}
@@ -1514,10 +1110,10 @@ function renderAdmin() {
   $("allowedBreakMinutes").value = settings.allowedBreakMinutes;
   $("monthlyLeaveLimit").value = settings.monthlyLeaveLimit;
 
- setOptions();
-renderDepartmentOverview();
+  setOptions();
+  renderDepartmentOverview();
 
-const today = todayKey();
+  const today = todayKey();
   const activeEmployees = employees.filter(e => e.active !== false);
   const todayRecords = records.filter(r => r.date === today);
   const uniquePresent = new Set(todayRecords.map(r => r.empId)).size;
@@ -1528,9 +1124,7 @@ const today = todayKey();
   $("statLate").innerText = todayRecords.filter(isLate).length;
   $("statBreaks").innerText = todayRecords.reduce((sum, r) => sum + (r.breaks || []).length, 0);
   $("statLeaves").innerText = leaves.filter(l => l.status === "Pending").length;
-  $("statOverLeave").innerText = employees.filter(e =>
-    approvedLeaves(e.id, monthKey()) > empLeaveLimit(e.id)
-  ).length;
+  $("statOverLeave").innerText = employees.filter(e => approvedLeaves(e.id, monthKey()) > empLeaveLimit(e.id)).length;
   $("statLateBreaks").innerText = todayRecords.filter(isLateBreak).length;
 
   $("employeeTable").innerHTML = employees.map(e => `
@@ -1545,46 +1139,26 @@ const today = todayKey();
       <td>${e.leaveLimit || settings.monthlyLeaveLimit}</td>
       <td>${e.active !== false ? "Active" : "Inactive"}</td>
       <td>
-
-<button onclick="toggleEmployee('${e.id}', ${e.active !== false})">
-    ${e.active !== false ? "Disable" : "Enable"}
-</button>
-
-<button onclick="editEmployee('${e.id}')">
-    Edit
-</button>
-
-<button class="red"
-onclick="deleteEmployee('${e.id}')">
-    Delete
-</button>
-
-</td>
+        <button onclick="toggleEmployee('${e.id}', ${e.active !== false})">${e.active !== false ? "Disable" : "Enable"}</button>
+        <button onclick="editEmployee('${e.id}')">Edit</button>
+        <button class="red" onclick="deleteEmployee('${e.id}')">Delete</button>
+      </td>
     </tr>
   `).join("");
 
   if ($("idCardBox")) {
     $("idCardBox").innerHTML = employees.map(e => `
       <div class="id-card">
-        <div class="id-card-header">
-          <h2>SBX HR</h2>
-          <span>Employee ID Card</span>
-        </div>
-
-        <div class="id-card-photo">
-          <img src="${e.photo || 'https://via.placeholder.com/120'}">
-        </div>
-
+        <div class="id-card-header"><h2>SBX HR</h2><span>Employee ID Card</span></div>
+        <div class="id-card-photo"><img src="${e.photo || 'https://via.placeholder.com/120'}"></div>
         <h3>${e.name || 'Employee'}</h3>
         <p class="id-designation">${e.designation || 'Employee'}</p>
-
         <div class="id-card-info">
           <p><b>Code:</b> ${e.code || '-'}</p>
           <p><b>Department:</b> ${e.department || '-'}</p>
           <p><b>Salary:</b> ₹${e.salary || 0}</p>
           <p><b>Status:</b> ${e.active !== false ? 'Active' : 'Inactive'}</p>
         </div>
-
         <button onclick="window.print()">Print Card</button>
       </div>
     `).join("");
@@ -1592,7 +1166,6 @@ onclick="deleteEmployee('${e.id}')">
 
   $("attendanceTable").innerHTML = filtered(records).map(r => {
     const breaks = r.breaks || [];
-
     const details = breaks.map((b, i) => {
       const duration = b.end ? fmt(minutesBetween(b.start, b.end)) : "Running";
       return `Break ${i + 1}: ${showTime(b.start)} - ${showTime(b.end)} (${duration})`;
@@ -1600,257 +1173,119 @@ onclick="deleteEmployee('${e.id}')">
 
     return `
       <tr>
-        <td>${r.date}</td>
-        <td>${r.name}</td>
-        <td>${showTime(r.entry)}</td>
-        <td>
-  ${isLate(r)
-    ? `<span class="late-pill">⏰ ${lateMinutes(r)}m</span>`
-    : `<span class="ontime-pill">✅ On Time</span>`}
-</td>
-        <td>${showTime(r.exit)}</td>
-        <td>${breaks.length}</td>
-        <td>${fmt(calcBreak(breaks))}</td>
-        <td>${isLateBreak(r) ? "Yes" : "No"}</td>
-        <td>${calcWorking(r)}</td>
-        <td>${details}</td>
+        <td>${r.date}</td><td>${r.name}</td><td>${showTime(r.entry)}</td>
+        <td>${isLate(r) ? `<span class="late-pill">⏰ ${lateMinutes(r)}m</span>` : `<span class="ontime-pill">✅ On Time</span>`}</td>
+        <td>${showTime(r.exit)}</td><td>${breaks.length}</td><td>${fmt(calcBreak(breaks))}</td><td>${isLateBreak(r) ? "Yes" : "No"}</td><td>${calcWorking(r)}</td><td>${details}</td>
       </tr>
     `;
   }).join("");
 
-  $("leaveTable").innerHTML = filtered(leaves)
-  .filter(l => l.status === "Pending")
-  .map(l => {
+  $("leaveTable").innerHTML = filtered(leaves).filter(l => l.status === "Pending").map(l => {
     const month = l.date?.slice(0, 7);
     const count = approvedLeaves(l.empId, month);
     const limit = empLeaveLimit(l.empId);
-
     return `
       <tr>
-        <td>${l.name}</td>
-        <td>${l.date}</td>
-        <td>${l.reason}</td>
-        <td>${l.status}</td>
-        <td>${count}/${limit}</td>
-        <td>${count > limit ? "Yes" : "No"}</td>
-        <td>
-          <button class="green" onclick="approveLeave('${l.id}')">Approve</button>
-          <button class="red" onclick="rejectLeave('${l.id}')">Reject</button>
-        </td>
+        <td>${l.name}</td><td>${l.date}</td><td>${l.reason}</td><td>${l.status}</td><td>${count}/${limit}</td><td>${count > limit ? "Yes" : "No"}</td>
+        <td><button class="green" onclick="approveLeave('${l.id}')">Approve</button><button class="red" onclick="rejectLeave('${l.id}')">Reject</button></td>
       </tr>
     `;
   }).join("");
 
-  $("workTable").innerHTML = filtered(workUpdates).map(w => `
-    <tr>
-      <td>${w.date}</td>
-      <td>${w.name}</td>
-      <td>${w.text}</td>
-    </tr>
-  `).join("");
+  $("workTable").innerHTML = filtered(workUpdates).map(w => `<tr><td>${w.date}</td><td>${w.name}</td><td>${w.text}</td></tr>`).join("");
 
   $("taskTable").innerHTML = filtered(tasks).map(t => `
     <tr>
-      <td>${t.date}</td>
-      <td>${t.name}</td>
-      <td>${t.text}</td>
-      <td>${t.status}</td>
-      <td>
- ${t.completedAt
-   ? new Date(t.completedAt).toLocaleString()
-   : "-"
- }
-</td>
-      <td>
-  <button class="red" onclick="deleteTask('${t.id}')">Delete</button>
-</td>
+      <td>${t.date || "-"}</td>
+      <td><strong>${t.taskCode || "-"}</strong></td>
+      <td>${t.business || "-"}</td>
+      <td>${t.department || "-"}</td>
+      <td>${t.name || "-"}</td>
+      <td>${t.text || "-"}</td>
+      <td><span class="badge" style="padding: 2px 6px; border-radius: 4px; background: #eee;">${t.priority || "Medium"}</span></td>
+      <td>${t.deadline || "-"}</td>
+      <td>${t.status || "-"}</td>
+      <td>${t.completedAt ? new Date(t.completedAt).toLocaleString("en-IN") : "-"}</td>
+      <td><button class="red" onclick="deleteTask('${t.id}')">Delete</button></td>
     </tr>
   `).join("");
 
-  $("noteTable").innerHTML = filtered(notes).map(n => `
-    <tr>
-      <td>${n.date}</td>
-      <td>${n.name}</td>
-      <td>${n.text}</td>
-    </tr>
-  `).join("");
-
-  $("documentTable").innerHTML = documentsList.map(d => `
-    <tr>
-      <td>${d.name}</td>
-      <td>${d.type}</td>
-      <td><a href="${d.url}" target="_blank">Open</a></td>
-      <td>${d.date}</td>
-    </tr>
-  `).join("");
+  $("noteTable").innerHTML = filtered(notes).map(n => `<tr><td>${n.date}</td><td>${n.name}</td><td>${n.text}</td></tr>`).join("");
+  $("documentTable").innerHTML = documentsList.map(d => `<tr><td>${d.name}</td><td>${d.type}</td><td><a href="${d.url}" target="_blank">Open</a></td><td>${d.date}</td></tr>`).join("");
 
   renderLeaveBalance();
-renderPayroll();
-renderCalendar();
-renderCharts(todayRecords);
-renderAnnouncements();
-renderBirthdays();
+  renderPayroll();
+  renderCalendar();
+  renderCharts(todayRecords);
+  renderAnnouncements();
+  renderBirthdays();
 }
+
 function renderLeaveBalance() {
   if (!$("leaveBalanceTable")) return;
-
   const month = filterMonth || monthKey();
-
   $("leaveBalanceTable").innerHTML = employees.map(emp => {
-
     const limit = empLeaveLimit(emp.id);
-
-    const approved = leaves.filter(l =>
-      l.empId === emp.id &&
-      l.status === "Approved" &&
-      l.date?.startsWith(month)
-    ).length;
-
-    const pending = leaves.filter(l =>
-      l.empId === emp.id &&
-      l.status === "Pending" &&
-      l.date?.startsWith(month)
-    ).length;
-
+    const approved = leaves.filter(l => l.empId === emp.id && l.status === "Approved" && l.date?.startsWith(month)).length;
+    const pending = leaves.filter(l => l.empId === emp.id && l.status === "Pending" && l.date?.startsWith(month)).length;
     const remaining = Math.max(0, limit - approved);
     const extra = Math.max(0, approved - limit);
-
-    return `
-      <tr>
-        <td>${emp.name}</td>
-        <td>${limit}</td>
-        <td>${approved}</td>
-        <td>${pending}</td>
-        <td>${remaining}</td>
-        <td>${extra}</td>
-      </tr>
-    `;
+    return `<tr><td>${emp.name}</td><td>${limit}</td><td>${approved}</td><td>${pending}</td><td>${remaining}</td><td>${extra}</td></tr>`;
   }).join("");
 }
+
 function renderPayroll() {
   if (!$("salaryTable")) return;
-
   const month = filterMonth || monthKey();
-
   $("salaryTable").innerHTML = employees.map(e => {
-    const present = records.filter(r =>
-      r.empId === e.id &&
-      r.date?.startsWith(month)
-    ).length;
-
+    const present = records.filter(r => r.empId === e.id && r.date?.startsWith(month)).length;
     const approved = approvedLeaves(e.id, month);
     const absent = Math.max(0, 30 - present - approved);
-
     const payroll = payrollFor(e.id, month);
     const salary = Number(e.salary || 0);
     const perDay = salary / 30;
-
-    const finalSalary = Math.max(
-      0,
-      Math.round(salary - (absent * perDay) + Number(payroll.bonus || 0) - Number(payroll.deduction || 0))
-    );
-
-    return `
-      <tr>
-        <td>${e.name}</td>
-        <td>₹${salary}</td>
-        <td>${present}</td>
-        <td>${approved}</td>
-        <td>${absent}</td>
-        <td>₹${payroll.bonus || 0}</td>
-        <td>₹${payroll.deduction || 0}</td>
-        <td>₹${finalSalary}</td>
-      </tr>
-    `;
+    const finalSalary = Math.max(0, Math.round(salary - (absent * perDay) + Number(payroll.bonus || 0) - Number(payroll.deduction || 0)));
+    return `<tr><td>${e.name}</td><td>₹${salary}</td><td>${present}</td><td>${approved}</td><td>${absent}</td><td>₹${payroll.bonus || 0}</td><td>₹${payroll.deduction || 0}</td><td>₹${finalSalary}</td></tr>`;
   }).join("");
 }
 
 function renderMyTasks() {
   if (!currentEmployee || !$("myTaskTable")) return;
-
   const selectedDate = $("myTaskDate")?.value || todayKey();
-
   let myTasks = tasks.filter(t => t.empId === currentEmployee.id);
 
-  if (myTaskMode === "pending") {
-    myTasks = myTasks.filter(t => t.status === "Pending");
-}
-else if (myTaskMode === "completed") {
-    myTasks = myTasks.filter(t => t.status === "Done");
-}
-else {
-    myTasks = myTasks.filter(t => t.date === selectedDate);
-}
+  if (myTaskMode === "pending") myTasks = myTasks.filter(t => t.status === "Pending");
+  else if (myTaskMode === "completed") myTasks = myTasks.filter(t => t.status === "Done");
+  else myTasks = myTasks.filter(t => t.date === selectedDate);
 
   $("myTaskTable").innerHTML = myTasks.map(t => `
     <tr>
-      <td>${t.date}</td>
-      <td>${t.text}</td>
-      <td>${t.status}</td>
-      <td>
-        ${t.status === "Pending"
-          ? `<button onclick="markTaskDone('${t.id}')">Mark Done</button>`
-          : "Done"}
-      </td>
+      <td>${t.date}</td><td>${t.text}</td><td>${t.status}</td>
+      <td>${t.status === "Pending" ? `<button onclick="markTaskDone('${t.id}')">Mark Done</button>` : "Done"}</td>
     </tr>
-  `).join("") || `
-    <tr>
-      <td colspan="4">Is date ya filter me koi task nahi hai.</td>
-    </tr>
-  `;
+  `).join("") || `<tr><td colspan="4">Is date ya filter me koi task nahi hai.</td></tr>`;
 }
+
 function renderEmployeeGraphs() {
   if (!currentEmployee || !$("employeeGraphBox")) return;
-
   const month = monthKey();
-
-  const myRecords = records.filter(r =>
-    r.empId === currentEmployee.id &&
-    r.date?.startsWith(month)
-  );
-
-  const myLeaves = leaves.filter(l =>
-    l.empId === currentEmployee.id &&
-    l.date?.startsWith(month)
-  );
-
+  const myRecords = records.filter(r => r.empId === currentEmployee.id && r.date?.startsWith(month));
+  const myLeaves = leaves.filter(l => l.empId === currentEmployee.id && l.date?.startsWith(month));
   const myTasks = tasks.filter(t => t.empId === currentEmployee.id);
 
   const present = myRecords.length;
   const approvedLeavesCount = myLeaves.filter(l => l.status === "Approved").length;
-  const pendingLeavesCount = myLeaves.filter(l => l.status === "Pending").length;
   const totalBreakMinutes = myRecords.reduce((sum, r) => sum + calcBreak(r.breaks || []), 0);
   const doneTasks = myTasks.filter(t => t.status === "Done").length;
   const pendingTasks = myTasks.filter(t => t.status === "Pending").length;
 
   function circleCard(title, value, max, note) {
     const percent = max ? Math.min(100, Math.round((value / max) * 100)) : 0;
-
-    return `
-      <div class="circle-card">
-        <div class="circle" style="--p:${percent}">
-          <span>${percent}%</span>
-        </div>
-        <h4>${title}</h4>
-        <p>${value} / ${max}</p>
-        <small>${note}</small>
-      </div>
-    `;
+    return `<div class="circle-card"><div class="circle" style="--p:${percent}"><span>${percent}%</span></div><h4>${title}</h4><p>${value} / ${max}</p><small>${note}</small></div>`;
   }
-
   function progressCard(title, value, max, note) {
     const percent = max ? Math.min(100, Math.round((value / max) * 100)) : 0;
-
-    return `
-      <div class="chart-card">
-        <h4>${title}</h4>
-        <div class="big-bar">
-          <i style="width:${percent}%"></i>
-        </div>
-        <p><b>${value}</b> / ${max}</p>
-        <small>${note}</small>
-      </div>
-    `;
+    return `<div class="chart-card"><h4>${title}</h4><div class="big-bar"><i style="width:${percent}%"></i></div><p><b>${value}</b> / ${max}</p><small>${note}</small></div>`;
   }
 
   $("employeeGraphBox").innerHTML = `
@@ -1860,6 +1295,7 @@ function renderEmployeeGraphs() {
     ${progressCard("Tasks Done", doneTasks, doneTasks + pendingTasks || 1, "Task completion status")}
   `;
 }
+
 function renderAll() {
   renderAdmin();
   renderTodayStatus();
@@ -1880,82 +1316,31 @@ function renderAll() {
 }
 
 window.exportCSV = function () {
-  const rows = [
-    ["Date", "Name", "Entry", "Late", "Exit", "Break Count", "Total Break", "Late Break", "Working Hours"]
-  ];
-
+  const rows = [["Date", "Name", "Entry", "Late", "Exit", "Break Count", "Total Break", "Late Break", "Working Hours"]];
   filtered(records).forEach(r => {
-    rows.push([
-      r.date,
-      r.name,
-      showTime(r.entry),
-      isLate(r) ? "Late" : "On Time",
-      showTime(r.exit),
-      (r.breaks || []).length,
-      fmt(calcBreak(r.breaks || [])),
-      isLateBreak(r) ? "Yes" : "No",
-      calcWorking(r)
-    ]);
+    rows.push([r.date, r.name, showTime(r.entry), isLate(r) ? "Late" : "On Time", showTime(r.exit), (r.breaks || []).length, fmt(calcBreak(r.breaks || [])), isLateBreak(r) ? "Yes" : "No", calcWorking(r)]);
   });
-
-  const csv = rows.map(row =>
-    row.map(v => `"${String(v || "").replaceAll('"', '""')}"`).join(",")
-  ).join("\n");
-
+  const csv = rows.map(row => row.map(v => `"${String(v || "").replaceAll('"', '""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
-
   a.href = URL.createObjectURL(blob);
   a.download = "attendance-report.csv";
   a.click();
 };
+
 function resetMonth(){
-
-  if(!confirm(
-    "Close current month?\n\nAttendance, tasks, rewards and leave data will be archived."
-  )) return;
-
-  localStorage.setItem(
-    "hrms_archive_" + new Date().toISOString(),
-    JSON.stringify({
-      employees,
-      records,
-      tasks,
-      leaves
-    })
-  );
-
-  records = [];
-  tasks = [];
-  leaves = [];
-
-  saveData();
-
+  if(!confirm("Close current month?\n\nAttendance, tasks, rewards and leave data will be archived.")) return;
+  localStorage.setItem("hrms_archive_" + new Date().toISOString(), JSON.stringify({ employees, records, tasks, leaves }));
+  records = []; tasks = []; leaves = [];
   alert("✅ New Month Started Successfully");
-
   location.reload();
 }
-window.toggleSidebar = function () {
-  document.body.classList.toggle("sidebar-open");
-};
+
+window.toggleSidebar = function () { document.body.classList.toggle("sidebar-open"); };
+
 window.exportBackup = function(){
-  const data = {
-    employees,
-    records,
-    tasks,
-    leaves,
-    workUpdates,
-    notes,
-    announcements,
-    documentsList,
-    payrolls,
-    exportedAt: nowISO()
-  };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json"
-  });
-
+  const data = { employees, records, tasks, leaves, workUpdates, notes, announcements, documentsList, payrolls, exportedAt: nowISO() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "sbx-hrms-backup.json";
@@ -1965,9 +1350,7 @@ window.exportBackup = function(){
 window.importBackup = function(event){
   const file = event.target.files[0];
   if(!file) return;
-
   const reader = new FileReader();
-
   reader.onload = function(e){
     try{
       const data = JSON.parse(e.target.result);
@@ -1977,55 +1360,12 @@ window.importBackup = function(event){
       alert("Invalid backup file");
     }
   };
-
   reader.readAsText(file);
 };
-window.editEmployee = async function(id){
 
-  const emp = employees.find(e => e.id === id);
-
-  if(!emp){
-    alert("Employee not found");
-    return;
-  }
-
-  const name = prompt("Employee Name", emp.name || "");
-  if(name === null) return;
-
-  const code = prompt("Employee Code", emp.code || "");
-  if(code === null) return;
-
-  const pin = prompt("Employee PIN", emp.pin || "");
-  if(pin === null) return;
-
-  const designation = prompt("Designation", emp.designation || "");
-  if(designation === null) return;
-
-  const salary = prompt("Monthly Salary", emp.salary || 0);
-  if(salary === null) return;
-
-  const leaveLimit = prompt("Monthly Leave Limit", emp.leaveLimit || settings.monthlyLeaveLimit || 2);
-  if(leaveLimit === null) return;
-
-  await updateDoc(doc(db, "employees", id), {
-    name,
-    code,
-    pin,
-    designation,
-    salary: Number(salary || 0),
-    leaveLimit: Number(leaveLimit || 2)
-  });
-
-  alert("Employee updated");
-};
 window.editEmployee = function(id){
   const emp = employees.find(e => e.id === id);
-
-  if(!emp){
-    alert("Employee not found");
-    return;
-  }
-
+  if(!emp) { alert("Employee not found"); return; }
   editingEmployeeId = id;
 
   $("newEmpName").value = emp.name || "";
@@ -2038,13 +1378,11 @@ window.editEmployee = function(id){
   $("newEmpPhoto").value = emp.photo || "";
 
   const empDeps = emp.departments || [];
-
   document.querySelectorAll("#newEmpDepartment input").forEach(input => {
     input.checked = empDeps.includes(input.value);
   });
 
   const btn = document.querySelector('button[onclick="addEmployee()"]');
   if(btn) btn.innerText = "Update Employee";
-
   document.getElementById("employees")?.scrollIntoView({ behavior:"smooth" });
 };
