@@ -227,7 +227,6 @@ window.login = function () {
   }
 
   currentEmployee = emp;
-  $("employeeWelcome").innerText = `Welcome, ${emp.name}`;
   $("loginBox").classList.add("hidden");
   $("employeePanel").classList.remove("hidden");
   renderAll();
