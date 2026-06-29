@@ -1251,6 +1251,7 @@ function renderPayroll() {
 
 function renderMyTasks() {
   if (!currentEmployee || !$("myTaskTable")) return;
+
   const selectedDate = $("myTaskDate")?.value || todayKey();
   let myTasks = tasks.filter(t => t.empId === currentEmployee.id);
 
@@ -1260,10 +1261,21 @@ function renderMyTasks() {
 
   $("myTaskTable").innerHTML = myTasks.map(t => `
     <tr>
-      <td>${t.date}</td><td>${t.text}</td><td>${t.status}</td>
-      <td>${t.status === "Pending" ? `<button onclick="markTaskDone('${t.id}')">Mark Done</button>` : "Done"}</td>
+      <td>${t.date || "-"}</td>
+      <td><strong>${t.taskCode || "-"}</strong></td>
+      <td>${t.business || "-"}</td>
+      <td>${t.department || "-"}</td>
+      <td>${t.text || "-"}</td>
+      <td><span class="badge" style="padding: 2px 6px; border-radius: 4px; background: #e5e7eb; color: #1f2937;">${t.priority || "Medium"}</span></td>
+      <td>${t.deadline || "-"}</td>
+      <td>${t.status || "-"}</td>
+      <td>
+        ${t.status === "Pending"
+          ? `<button onclick="markTaskDone('${t.id}')" style="padding: 6px 12px; font-size: 12px;">Mark Done</button>`
+          : '<span style="color: #16a34a; font-weight: bold;">Done ✅</span>'}
+      </td>
     </tr>
-  `).join("") || `<tr><td colspan="4">Is date ya filter me koi task nahi hai.</td></tr>`;
+  `).join("") || `<tr><td colspan="9" style="text-align: center; padding: 20px;">Is filter me aapka koi task nahi hai.</td></tr>`;
 }
 
 function renderEmployeeGraphs() {
