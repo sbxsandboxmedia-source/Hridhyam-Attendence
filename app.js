@@ -41,6 +41,7 @@ let payrolls = [];
 
 let currentEmployee = null;
 let editingEmployeeId = null;
+let editingTaskId = null;
 let myTaskMode = "today";
 let messages = [];
 let settings = {
