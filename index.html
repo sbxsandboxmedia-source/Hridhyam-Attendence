@@ -215,20 +215,45 @@
             </div>
             <div class="card" id="tasks">
                <h3>Assign Daily Task</h3>
-               <div class="grid-4"><select id="taskEmployee"></select><input type="date" id="taskDate"><input id="taskText" placeholder="Task likho..."><button onclick="assignTask()">Assign Task</button></div>
+               <div class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+   <select id="taskEmployee"></select>
+   <input type="date" id="taskDate">
+   
+   <!-- Naye Fields -->
+   <input id="taskBusiness" placeholder="Business Name">
+   <select id="taskDepartment">
+      <option value="">Select Department</option>
+   </select>
+   <input id="taskCode" placeholder="Task Code (e.g. TSK-01)">
+   <input type="date" id="taskDeadline" title="Deadline Date">
+   <select id="taskPriority">
+      <option value="Medium">Select Priority</option>
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+   </select>
+   
+   <input id="taskText" placeholder="Task description likho..." style="grid-column: 1 / -1;">
+   <button onclick="assignTask()" style="grid-column: 1 / -1;">Assign Task</button>
+</div>
                <h3>Task List</h3>
                <div class="table-wrap">
                   <table>
                      <thead>
-                        <tr>
-                           <th>Date</th>
-                           <th>Employee</th>
-                           <th>Task</th>
-                           <th>Status</th>
-                           <th>Completed</th>
-                           <th>Action</th>
-                        </tr>
-                     </thead>
+   <tr>
+      <th>Date</th>
+      <th>Task Code</th>
+      <th>Business</th>
+      <th>Department</th>
+      <th>Employee</th>
+      <th>Task Description</th>
+      <th>Priority</th>
+      <th>Deadline</th>
+      <th>Status</th>
+      <th>Completed At</th>
+      <th>Action</th>
+   </tr>
+</thead>
                      <tbody id="taskTable"></tbody>
                   </table>
                </div>
