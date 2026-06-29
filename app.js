@@ -433,6 +433,37 @@ window.deleteTask = async function(id){
   }
 };
 
+window.editTask = function(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) {
+    alert("Task nahi mila!");
+    return;
+  }
+
+  // Edit mode on karna aur ID save karna
+  editingTaskId = id;
+
+  // Saara data wapas inputs me fill karna
+  $("taskEmployee").value = task.empId || "";
+  $("taskDate").value = task.date || "";
+  $("taskBusiness").value = task.business === "-" ? "" : task.business;
+  $("taskDepartment").value = task.department === "-" ? "" : task.department;
+  $("taskCode").value = task.taskCode === "-" ? "" : task.taskCode;
+  $("taskDeadline").value = task.deadline === "-" ? "" : task.deadline;
+  $("taskPriority").value = task.priority || "Medium";
+  $("taskText").value = task.text || "";
+
+  // Assign Task wale button ka text badal kar "Update Task" karna
+  const btn = document.querySelector('button[onclick="assignTask()"]');
+  if (btn) {
+    btn.innerText = "Update Task";
+    btn.style.background = "#f59e0b"; // thoda alag color takki pata chale edit chal raha h
+  }
+
+  // Screen ko scroll karke upar form par le jana
+  document.getElementById("tasks")?.scrollIntoView({ behavior: "smooth" });
+};
+
 window.assignTask = async function () {
   const empId = $("taskEmployee").value;
   const emp = employees.find(e => e.id === empId);
@@ -450,7 +481,7 @@ window.assignTask = async function () {
     return;
   }
 
-  await addDoc(collection(db, "tasks"), {
+  const taskData = {
     empId: emp.id,
     name: emp.name,
     date,
@@ -460,10 +491,23 @@ window.assignTask = async function () {
     taskCode: taskCode || "-",
     deadline: deadline || "-",
     priority: priority || "Medium",
-    status: "Pending",
-    createdAt: nowISO()
-  });
+    updatedAt: nowISO()
+  };
 
+  if (editingTaskId) {
+    // Agar edit chal rha hai toh update karo
+    await updateDoc(doc(db, "tasks", editingTaskId), taskData);
+    editingTaskId = null;
+    alert("Task successfully update ho gaya!");
+  } else {
+    // Agar normal chal rha hai toh naya banao
+    taskData.status = "Pending";
+    taskData.createdAt = nowISO();
+    await addDoc(collection(db, "tasks"), taskData);
+    alert("Task successfully assign ho gaya!");
+  }
+
+  // Form ko wapas se clean karna
   $("taskText").value = "";
   $("taskBusiness").value = "";
   $("taskDepartment").value = "";
@@ -471,7 +515,12 @@ window.assignTask = async function () {
   $("taskDeadline").value = "";
   $("taskPriority").value = "Medium";
   
-  alert("Task successfully assign ho gaya!");
+  // Button ka naam wapas normal karna
+  const btn = document.querySelector('button[onclick="assignTask()"]');
+  if (btn) {
+    btn.innerText = "Assign Task";
+    btn.style.background = "#2563eb";
+  }
 };
 
 window.markTaskDone = async function (id) {
