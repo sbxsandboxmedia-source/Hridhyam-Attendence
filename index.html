@@ -214,27 +214,58 @@
                <div id="calendarBox" class="calendar-box"></div>
             </div>
             <div class="card" id="tasks">
-               <h3>Assign Daily Task</h3>
-               <div class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-   <select id="taskEmployee"></select>
-   <input type="date" id="taskDate">
-   
-   <!-- Naye Fields -->
-   <input id="taskBusiness" placeholder="Business Name">
-   <select id="taskDepartment">
-      <option value="">Select Department</option>
-   </select>
-   <input id="taskCode" placeholder="Task Code (e.g. TSK-01)">
-   <input type="date" id="taskDeadline" title="Deadline Date">
-   <select id="taskPriority">
-      <option value="Medium">Select Priority</option>
-      <option value="Low">Low</option>
-      <option value="Medium">Medium</option>
-      <option value="High">High</option>
-   </select>
-   
-   <input id="taskText" placeholder="Task description likho..." style="grid-column: 1 / -1;">
-   <button onclick="assignTask()" style="grid-column: 1 / -1;">Assign Task</button>
+   <h3>Assign Daily Task</h3>
+   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px;">
+      
+      <div>
+         <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Select Employee:</label>
+         <select id="taskEmployee" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;"></select>
+      </div>
+
+      <div>
+         <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Task Given Date:</label>
+         <input type="date" id="taskDate" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+      </div>
+      
+      <div>
+         <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Business Name:</label>
+         <input id="taskBusiness" placeholder="Business Name" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+      </div>
+
+      <div>
+         <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Department:</label>
+         <select id="taskDepartment" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="">Select Department</option>
+         </select>
+      </div>
+
+      <div>
+         <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Task Code:</label>
+         <input id="taskCode" placeholder="Task Code (e.g. TSK-01)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+      </div>
+
+      <div>
+         <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Task Deadline:</label>
+         <input type="date" id="taskDeadline" title="Deadline Date" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+      </div>
+
+      <div>
+         <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Priority:</label>
+         <select id="taskPriority" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="Medium">Select Priority</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+         </select>
+      </div>
+   </div>
+
+   <div style="margin-bottom: 15px;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555;">Task Description:</label>
+      <input id="taskText" placeholder="Task description likho..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+   </div>
+
+   <button onclick="assignTask()" style="width: 100%; padding: 10px; background: #2563eb; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Assign Task</button>
 </div>
                <h3>Task List</h3>
                <div class="table-wrap">
