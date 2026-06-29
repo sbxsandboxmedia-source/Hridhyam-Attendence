@@ -1206,7 +1206,10 @@ function renderAdmin() {
       <td>${t.deadline || "-"}</td>
       <td>${t.status || "-"}</td>
       <td>${t.completedAt ? new Date(t.completedAt).toLocaleString("en-IN") : "-"}</td>
-      <td><button class="red" onclick="deleteTask('${t.id}')">Delete</button></td>
+      <td>
+        <button class="yellow" onclick="editTask('${t.id}')" style="padding: 6px 10px; font-size: 12px; margin-bottom: 4px;">Edit</button>
+        <button class="red" onclick="deleteTask('${t.id}')" style="padding: 6px 10px; font-size: 12px;">Delete</button>
+      </td>
     </tr>
   `).join("");
 
